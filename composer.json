@@ -1,0 +1,13 @@
+{
+    "name": "local/jurnalmengajar",
+    "description": "local/jurnalmengajar",
+    "authors": [
+        {
+            "name": "Noor Ridhwan",
+            "email": "noor.ridhwan@ymail.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^4.4"
+    }
+}

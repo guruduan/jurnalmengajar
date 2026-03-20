@@ -1,0 +1,5 @@
+vendor/
+*.log
+*.zip
+*.sql
+node_modules/

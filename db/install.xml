@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/jurnalmengajar/db"
+       VERSION="2026030200"
+       COMMENT="Final production schema Jurnal Mengajar"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+
+<TABLES>
+
+<!-- ========================= -->
+<!-- JURNAL MENGAJAR -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalmengajar">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="nomor" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+<FIELD NAME="kelas" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="jamke" TYPE="char" LENGTH="10"/>
+<FIELD NAME="matapelajaran" TYPE="char" LENGTH="100" NOTNULL="true"/>
+<FIELD NAME="materi" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="aktivitas" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="absen" TYPE="text"/>
+<FIELD NAME="keterangan" TYPE="text"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true" DEFAULT="0"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
+</TABLE>
+
+<!-- ========================= -->
+<!-- SURAT IZIN SISWA -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalmengajar_suratizin">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="kelasid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="guru_pengajar" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="alasan" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="keperluan" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="penginput" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
+</TABLE>
+
+<!-- ========================= -->
+<!-- SURAT IZIN GURU -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalmengajar_suratizinguru">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="alasan" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="keperluan" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="waktuinput" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="nip" TYPE="char" LENGTH="50"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+</TABLE>
+
+<!-- ========================= -->
+<!-- GURU WALI -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalguruwali">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="guruid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="muridid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="topik" TYPE="text"/>
+<FIELD NAME="tindaklanjut" TYPE="text"/>
+<FIELD NAME="keterangan" TYPE="text"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+<INDEXES>
+<INDEX NAME="guruid_idx" UNIQUE="false" FIELDS="guruid"/>
+<INDEX NAME="muridid_idx" UNIQUE="false" FIELDS="muridid"/>
+<INDEX NAME="timecreated_idx" UNIQUE="false" FIELDS="timecreated"/>
+</INDEXES>
+</TABLE>
+
+<!-- ========================= -->
+<!-- PRAMUKA -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalpramuka">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="kelas" TYPE="char" LENGTH="50" NOTNULL="true"/>
+<FIELD NAME="materi" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="absen" TYPE="text" NOTNULL="true"/>
+<FIELD NAME="catatan" TYPE="text"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+</TABLE>
+
+<!-- ========================= -->
+<!-- LAYANAN BK -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnallayananbk">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="kelas" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="jenislayanan" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="topik" TYPE="char" LENGTH="255"/>
+<FIELD NAME="peserta" TYPE="text"/>
+<FIELD NAME="tindaklanjut" TYPE="text"/>
+<FIELD NAME="catatan" TYPE="text"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
+</TABLE>
+
+</TABLES>
+</XMLDB>

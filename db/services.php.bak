@@ -1,0 +1,54 @@
+<?php
+
+$functions = [
+
+    'local_jurnalmengajar_get_jurnal_entries' => [
+        'classname'   => 'local_jurnalmengajar\external\get_jurnal_entries',
+        'methodname'  => 'execute',
+        'classpath'   => 'local/jurnalmengajar/classes/external/get_jurnal_entries.php',
+        'description' => 'Ambil entri jurnal untuk user saat ini',
+        'type'        => 'read',
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+
+    'local_jurnalmengajar_submit_jurnal' => [
+        'classname'   => 'local_jurnalmengajar\external\submit_jurnal',
+        'methodname'  => 'execute',
+        'classpath'   => 'local/jurnalmengajar/classes/external/submit_jurnal.php',
+        'description' => 'Kirim entri jurnal dari mobile app',
+        'type'        => 'write',
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+
+    'local_jurnalmengajar_get_students_by_kelas' => [
+        'classname'   => 'local_jurnalmengajar\external\get_students_by_kelas',
+        'methodname'  => 'execute',
+        'classpath'   => 'local/jurnalmengajar/classes/external/get_students_by_kelas.php',
+        'description' => 'Ambil daftar siswa dari cohort berdasarkan nama kelas',
+        'type'        => 'read',
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ]
+'local_jurnalmengajar_get_kelas_list' => [
+    'classname'   => 'local_jurnalmengajar\external\get_kelas_list',
+    'methodname'  => 'execute',
+    'classpath'   => 'local/jurnalmengajar/classes/external/get_kelas_list.php',
+    'description' => 'Ambil daftar kelas (cohort)',
+    'type'        => 'read',
+    'ajax'        => true,
+    'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+],
+
+'local_jurnalmengajar_get_matapelajaran_list' => [
+    'classname'   => 'local_jurnalmengajar\external\get_matapelajaran_list',
+    'methodname'  => 'execute',
+    'classpath'   => 'local/jurnalmengajar/classes/external/get_matapelajaran_list.php',
+    'description' => 'Ambil daftar mata pelajaran',
+    'type'        => 'read',
+    'ajax'        => true,
+    'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+],
+
+];

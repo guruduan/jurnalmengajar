@@ -1,0 +1,21 @@
+<?php
+defined('MOODLE_INTERNAL') || die();
+
+$addons = [
+    "local_jurnalmengajar" => [
+        "handlers" => [
+            "jurnalhandler" => [
+                "delegate" => "CoreMainMenuDelegate",
+                "method" => "mobile_view",
+                "displaydata" => [
+                    "title" => "pluginname",
+                    "icon" => "local/jurnalmengajar/pix/icon.png", // ✅ BENAR
+                ]
+            ]
+        ],
+        "lang" => [
+            ["pluginname", "local_jurnalmengajar"]
+        ]
+
+    ]
+];

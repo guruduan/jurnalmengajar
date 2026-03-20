@@ -1,0 +1,116 @@
+2025-11-18 10:15:01 | Guru: Noor Ridhwan, S.Pd, M.A | Nomor: 6285393822018 | Kelas/Jam: XE:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:01 | Guru: Hartati Jum'ah S.Pd. | Nomor: 6283825107675 | Kelas/Jam: XC:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:01 | Guru: Silfiana Hasni, S.Pd | Nomor: 628125179077 | Kelas/Jam: XF:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:02 | Guru: Muhammad Saubari, S.Pd.I | Nomor: 6283150053356 | Kelas/Jam: XII-B:1,2; XI-B:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:02 | Guru: Rianawati, S.Pd | Nomor: 6282255494327 | Kelas/Jam: XII-C:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:02 | Guru: Siti Faridah, S.Pd | Nomor: 6282354396138 | Kelas/Jam: XII-C:1,2,3; XII-D:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:02 | Guru: Ema Susi Darmawati, S.Pd | Nomor: 6281256900970 | Kelas/Jam: XF:1,2; XC:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:02 | Guru: Drs. Muhammad Rafi'i, M.Pd | Nomor: 6281349790270 | Kelas/Jam: XI-F:1,2; XI-D:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:03 | Guru: Samnah Hayati, M.Pd | Nomor: 6285250251698 | Kelas/Jam: XI-C:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:03 | Guru: Mariatul Qibtiah S.Pd. | Nomor: 6281251964833 | Kelas/Jam: XI-D:1,2,3; XE:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:03 | Guru: Anna Herlina S.Pd. | Nomor: 6281349703401 | Kelas/Jam: XI-B:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:03 | Guru: Upik Ambarwati.S.P, S.Pd, M.M | Nomor: 6287811797517 | Kelas/Jam: XII-B:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:04 | Guru: Mahliyani, S.Pd | Nomor: 6285332641295 | Kelas/Jam: XB:1,2,3; XI-A:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:04 | Guru: Rakhmad Taufik, S.Pd | Nomor: 6282251040606 | Kelas/Jam: XA:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:04 | Guru: Nini Rahmini, S.PdI | Nomor: 6285179980381 | Kelas/Jam: XII-D:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:04 | Guru: M. Riduan S.Pd. | Nomor: 6285391766516 | Kelas/Jam: XI-G:1,2 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:04 | Guru: Fathah Arsyad, S.Pd. | Nomor: 6281349790813 | Kelas/Jam: XA:1,2,3; XII-E:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:05 | Guru: Sri Muliyatini, S.Pd | Nomor: 6285248326644 | Kelas/Jam: XD:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:05 | Guru: Fatia Elfira Luthfyari, S.Pd | Nomor: 6282148777514 | Kelas/Jam: XII-A:1,2 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:05 | Guru: Muhammad Naufal Akbar, M.Pd | Nomor: 6281351217242 | Kelas/Jam: XII-A:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:05 | Guru: Ainayya Almadiyati, S.Pd | Nomor: 6287846797486 | Kelas/Jam: XI-F:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:06 | Guru: Sri Hidayati, S.Pd | Nomor: 6282352382335 | Kelas/Jam: XG:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:06 | Guru: Halwa Nidain Najah, S.Pd | Nomor: 6283137526510 | Kelas/Jam: XG:4; XI-C:1,2 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:06 | Guru: Farindra Ramadhan Putra, S.Pd | Nomor: 6282351759786 | Kelas/Jam: XI-E:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:06 | Guru: Fitria Muallifah, S.Pd | Nomor: 6282159996335 | Kelas/Jam: XII-E:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:06 | Guru: Risyandi, S.Pd | Nomor: 6285248045053 | Kelas/Jam: XI-E:1,2; XI-G:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:07 | Guru: Indah Wiratesta Manik, S.Th | Nomor: 6285245062167 | Kelas/Jam: XG:1,2,3; XII-D:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:07 | Guru: Virawati,S.Pd | Nomor: 6281348893060 | Kelas/Jam: XB:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 10:15:07 | Guru: Muhammad Wildan Ariandi, S.Pd | Nomor: 6288258482439 | Kelas/Jam: XI-A:1,2,3; XD:4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:02 | Guru: Noor Ridhwan, S.Pd, M.A | Nomor: 6285393822018 | Kelas/Jam: XE:1,2,3; XG:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:02 | Guru: Hartati Jum'ah S.Pd. | Nomor: 6283825107675 | Kelas/Jam: XC:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:02 | Guru: Silfiana Hasni, S.Pd | Nomor: 628125179077 | Kelas/Jam: XF:3,4,5; XII-E:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:02 | Guru: Nadya Rahmi Sari, S.Pd | Nomor: 6281258964488 | Kelas/Jam: XI-G:5,6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:02 | Guru: Muhammad Saubari, S.Pd.I | Nomor: 6283150053356 | Kelas/Jam: XII-B:1,2; XI-B:4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:03 | Guru: Rianawati, S.Pd | Nomor: 6282255494327 | Kelas/Jam: XII-C:4,5; XII-B:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:03 | Guru: Siti Faridah, S.Pd | Nomor: 6282354396138 | Kelas/Jam: XII-C:1,2,3; XII-D:4,5; XI-B:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:03 | Guru: Ema Susi Darmawati, S.Pd | Nomor: 6281256900970 | Kelas/Jam: XA:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:03 | Guru: Drs. Muhammad Rafi'i, M.Pd | Nomor: 6281349790270 | Kelas/Jam: XI-F:1,2; XI-D:4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:04 | Guru: Dra. Tri Krisnawati, M.Pd | Nomor: 6282149302699 | Kelas/Jam: XII-B:5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:04 | Guru: Samnah Hayati, M.Pd | Nomor: 6285250251698 | Kelas/Jam: XI-C:3,4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:04 | Guru: Mariatul Qibtiah S.Pd. | Nomor: 6281251964833 | Kelas/Jam: XI-D:1,2,3; XE:4,5,6; XI-F:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:04 | Guru: Anna Herlina S.Pd. | Nomor: 6281349703401 | Kelas/Jam: XI-B:1,2,3; XI-A:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:04 | Guru: Khusnul Khotimah, S.Pd | Nomor: 6281351631284 | Kelas/Jam: XII-A:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:05 | Guru: Mahliyani, S.Pd | Nomor: 6285332641295 | Kelas/Jam: XB:1,2,3; XI-A:4,5; XII-C:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:05 | Guru: Rakhmad Taufik, S.Pd | Nomor: 6282251040606 | Kelas/Jam: XA:4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:05 | Guru: Nini Rahmini, S.PdI | Nomor: 6285179980381 | Kelas/Jam: XII-D:1,2,3; XC:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:05 | Guru: Fathah Arsyad, S.Pd. | Nomor: 6281349790813 | Kelas/Jam: XA:1,2,3; XII-E:4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:06 | Guru: Sri Muliyatini, S.Pd | Nomor: 6285248326644 | Kelas/Jam: XD:1,2,3; XI-E:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:06 | Guru: Fatia Elfira Luthfyari, S.Pd | Nomor: 6282148777514 | Kelas/Jam: XII-A:1,2; XB:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:06 | Guru: Ainayya Almadiyati, S.Pd | Nomor: 6287846797486 | Kelas/Jam: XI-F:3,4 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:06 | Guru: Halwa Nidain Najah, S.Pd | Nomor: 6283137526510 | Kelas/Jam: XG:4,5; XI-C:1,2 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:07 | Guru: Farindra Ramadhan Putra, S.Pd | Nomor: 6282351759786 | Kelas/Jam: XI-E:3,4,5; XF:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:07 | Guru: Fitria Muallifah, S.Pd | Nomor: 6282159996335 | Kelas/Jam: XII-E:1,2,3; XII-D:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:07 | Guru: Risyandi, S.Pd | Nomor: 6285248045053 | Kelas/Jam: XI-G:3,4; XI-F:5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:07 | Guru: Indah Wiratesta Manik, S.Th | Nomor: 6285245062167 | Kelas/Jam: XG:1,2,3; XII-D:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:08 | Guru: Virawati,S.Pd | Nomor: 6281348893060 | Kelas/Jam: XB:4,5; XE:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:08 | Guru: Fajri Wahyudi, S.Pd | Nomor: 6283151802254 | Kelas/Jam: XD:7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 12:50:08 | Guru: Muhammad Wildan Ariandi, S.Pd | Nomor: 6288258482439 | Kelas/Jam: XI-A:1,2,3; XD:4,5,6 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:02 | Guru: Hartati Jum'ah S.Pd. | Nomor: 6283825107675 | Kelas/Jam: XC:1,2,3; XA:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:02 | Guru: Sri Heldawati S.Pd. | Nomor: 6281253321031 | Kelas/Jam: XB:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:02 | Guru: Silfiana Hasni, S.Pd | Nomor: 628125179077 | Kelas/Jam: XF:3,4,5; XII-E:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:02 | Guru: Nadya Rahmi Sari, S.Pd | Nomor: 6281258964488 | Kelas/Jam: XI-G:5,6,7; XI-E:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:03 | Guru: Muhammad Saubari, S.Pd.I | Nomor: 6283150053356 | Kelas/Jam: XII-B:1,2; XI-B:4,5,6; XG:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:03 | Guru: Rianawati, S.Pd | Nomor: 6282255494327 | Kelas/Jam: XII-C:4,5; XII-B:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:03 | Guru: Siti Faridah, S.Pd | Nomor: 6282354396138 | Kelas/Jam: XII-C:1,2,3; XII-D:4,5; XI-B:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:03 | Guru: Ema Susi Darmawati, S.Pd | Nomor: 6281256900970 | Kelas/Jam: XA:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:04 | Guru: Drs. Muhammad Rafi'i, M.Pd | Nomor: 6281349790270 | Kelas/Jam: XI-F:1,2; XI-D:4,5,6; XII-B:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:04 | Guru: Dra. Tri Krisnawati, M.Pd | Nomor: 6282149302699 | Kelas/Jam: XII-B:5,6; XII-C:8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:04 | Guru: Samnah Hayati, M.Pd | Nomor: 6285250251698 | Kelas/Jam: XI-C:3,4,5,6; XI-A:8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:05 | Guru: Mariatul Qibtiah S.Pd. | Nomor: 6281251964833 | Kelas/Jam: XI-D:1,2,3; XE:4,5,6; XI-F:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:05 | Guru: Anna Herlina S.Pd. | Nomor: 6281349703401 | Kelas/Jam: XI-B:1,2,3; XI-A:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:05 | Guru: Khusnul Khotimah, S.Pd | Nomor: 6281351631284 | Kelas/Jam: XII-A:6,7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:05 | Guru: Mahliyani, S.Pd | Nomor: 6285332641295 | Kelas/Jam: XB:1,2,3; XI-A:4,5; XII-C:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:06 | Guru: Rakhmad Taufik, S.Pd | Nomor: 6282251040606 | Kelas/Jam: XA:4,5,6; XII-A:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:06 | Guru: Nini Rahmini, S.PdI | Nomor: 6285179980381 | Kelas/Jam: XII-D:1,2,3; XC:6,7; XB:8,9; XD:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:06 | Guru: Dra. Marfuah, M.Pd | Nomor: 6281953577602 | Kelas/Jam: XII-C:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:06 | Guru: Fathah Arsyad, S.Pd. | Nomor: 6281349790813 | Kelas/Jam: XA:1,2,3; XII-E:4,5,6; XII-D:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:07 | Guru: Sri Muliyatini, S.Pd | Nomor: 6285248326644 | Kelas/Jam: XD:1,2,3; XI-E:6,7,8; XF:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:07 | Guru: Fatia Elfira Luthfyari, S.Pd | Nomor: 6282148777514 | Kelas/Jam: XII-A:1,2; XB:6,7; XC:8,9; XI-C:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:07 | Guru: Ainayya Almadiyati, S.Pd | Nomor: 6287846797486 | Kelas/Jam: XI-F:3,4; XI-G:8,9; XI-A:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:07 | Guru: Farindra Ramadhan Putra, S.Pd | Nomor: 6282351759786 | Kelas/Jam: XI-E:3,4,5; XF:6,7,8; XE:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:08 | Guru: Fitria Muallifah, S.Pd | Nomor: 6282159996335 | Kelas/Jam: XII-D:6,7,8; XI-D:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:08 | Guru: Risyandi, S.Pd | Nomor: 6285248045053 | Kelas/Jam: XI-F:5 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:08 | Guru: Indah Wiratesta Manik, S.Th | Nomor: 6285245062167 | Kelas/Jam: XG:1,2,3,9,10; XII-D:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:08 | Guru: Virawati,S.Pd | Nomor: 6281348893060 | Kelas/Jam: XB:4,5; XE:7,8; XC:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:09 | Guru: Fajri Wahyudi, S.Pd | Nomor: 6283151802254 | Kelas/Jam: XD:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:09 | Guru: Muhammad Wildan Ariandi, S.Pd | Nomor: 6288258482439 | Kelas/Jam: XI-A:1,2,3; XD:4,5,6; XI-B:9,10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 15:30:09 | Guru: Ahmad Hafie, S.Pd | Nomor: 6283159483297 | Kelas/Jam: XI-G:10 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:01 | Guru: Hartati Jum'ah S.Pd. | Nomor: 6283825107675 | Kelas/Jam: XC:1,2,3; XA:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:02 | Guru: Sri Heldawati S.Pd. | Nomor: 6281253321031 | Kelas/Jam: XB:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:02 | Guru: Silfiana Hasni, S.Pd | Nomor: 628125179077 | Kelas/Jam: XF:3,4,5; XII-E:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:02 | Guru: Nadya Rahmi Sari, S.Pd | Nomor: 6281258964488 | Kelas/Jam: XI-G:5,6,7; XI-E:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:02 | Guru: Muhammad Saubari, S.Pd.I | Nomor: 6283150053356 | Kelas/Jam: XII-B:1,2; XI-B:4,5,6; XG:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:02 | Guru: Rianawati, S.Pd | Nomor: 6282255494327 | Kelas/Jam: XII-C:4,5; XII-B:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:03 | Guru: Siti Faridah, S.Pd | Nomor: 6282354396138 | Kelas/Jam: XII-C:1,2,3; XII-D:4,5; XI-B:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:03 | Guru: Ema Susi Darmawati, S.Pd | Nomor: 6281256900970 | Kelas/Jam: XA:7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:03 | Guru: Drs. Muhammad Rafi'i, M.Pd | Nomor: 6281349790270 | Kelas/Jam: XI-F:1,2; XI-D:4,5,6; XII-B:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:03 | Guru: Dra. Tri Krisnawati, M.Pd | Nomor: 6282149302699 | Kelas/Jam: XII-B:5,6; XII-C:8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:04 | Guru: Samnah Hayati, M.Pd | Nomor: 6285250251698 | Kelas/Jam: XI-C:3,4,5,6; XI-A:8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:04 | Guru: Mariatul Qibtiah S.Pd. | Nomor: 6281251964833 | Kelas/Jam: XI-D:1,2,3; XE:4,5,6; XI-F:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:04 | Guru: Anna Herlina S.Pd. | Nomor: 6281349703401 | Kelas/Jam: XI-B:1,2,3; XI-A:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:04 | Guru: Khusnul Khotimah, S.Pd | Nomor: 6281351631284 | Kelas/Jam: XII-A:6,7,8 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:05 | Guru: Mahliyani, S.Pd | Nomor: 6285332641295 | Kelas/Jam: XB:1,2,3; XI-A:4,5; XII-C:6,7 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:05 | Guru: Rakhmad Taufik, S.Pd | Nomor: 6282251040606 | Kelas/Jam: XA:4,5,6; XII-A:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:05 | Guru: Dra. Marfuah, M.Pd | Nomor: 6281953577602 | Kelas/Jam: XII-C:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:05 | Guru: Fathah Arsyad, S.Pd. | Nomor: 6281349790813 | Kelas/Jam: XA:1,2,3; XII-E:4,5,6; XII-D:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:06 | Guru: Sri Muliyatini, S.Pd | Nomor: 6285248326644 | Kelas/Jam: XD:1,2,3; XI-E:6,7,8; XF:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:06 | Guru: Fatia Elfira Luthfyari, S.Pd | Nomor: 6282148777514 | Kelas/Jam: XII-A:1,2; XB:6,7; XC:8,9; XI-C:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:06 | Guru: Ainayya Almadiyati, S.Pd | Nomor: 6287846797486 | Kelas/Jam: XI-F:3,4; XI-G:8,9; XI-A:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:06 | Guru: Farindra Ramadhan Putra, S.Pd | Nomor: 6282351759786 | Kelas/Jam: XI-E:3,4,5; XF:6,7,8; XE:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:07 | Guru: Risyandi, S.Pd | Nomor: 6285248045053 | Kelas/Jam: XI-F:5 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:07 | Guru: Indah Wiratesta Manik, S.Th | Nomor: 6285245062167 | Kelas/Jam: XG:1,2,3,9,10,11; XII-D:1,2,3 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:07 | Guru: Virawati,S.Pd | Nomor: 6281348893060 | Kelas/Jam: XB:4,5; XE:7,8; XC:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:07 | Guru: Fajri Wahyudi, S.Pd | Nomor: 6283151802254 | Kelas/Jam: XD:7,8,9 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:08 | Guru: Muhammad Wildan Ariandi, S.Pd | Nomor: 6288258482439 | Kelas/Jam: XI-A:1,2,3; XD:4,5,6; XI-B:9,10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}
+2025-11-18 17:00:08 | Guru: Ahmad Hafie, S.Pd | Nomor: 6283159483297 | Kelas/Jam: XI-G:10,11 | Status: {"status":false,"message":"device disconnected, need to scan qr code again"}

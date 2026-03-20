@@ -1,0 +1,18 @@
+.table-wrapper {
+    max-height: 80vh;         /* dulu 400px — sekarang lebih panjang & responsif */
+    overflow-y: auto;
+    overflow-x: auto;         /* kalau tabel melebar, bisa geser horizontal */
+    border: 1px solid #ddd;
+}
+
+.table-wrapper .generaltable thead th {
+    position: sticky;
+    top: 0;
+    background: #f0f0f0;
+    z-index: 5;
+}
+
+/* Opsional: sedikit lebih pendek di layar kecil */
+@media (max-width: 768px){
+    .table-wrapper { max-height: 65vh; }
+}
