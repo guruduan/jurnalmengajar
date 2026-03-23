@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_login();
+require_once(__DIR__ . '/lib.php');
 
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:submit', $context);
@@ -23,36 +24,23 @@ echo html_writer::link(new moodle_url('/local/jurnalmengajar/bydate.php'), '📅
 echo html_writer::end_div();
 
 global $DB;
-date_default_timezone_set('Asia/Makassar');
 
 // Tangani input tanggal
 $tanggal = optional_param('tanggal', date('Y-m-d'), PARAM_RAW);
 $timestamp = strtotime($tanggal);
-$start = strtotime('midnight', $timestamp);
-$end = strtotime('tomorrow midnight', $timestamp) - 1;
+$start = strtotime(date('Y-m-d 00:00:00', $timestamp));
+$end   = strtotime(date('Y-m-d 23:59:59', $timestamp));
 
-// Fungsi format lokal Indonesia
-function format_waktu_indonesia($timestamp) {
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
-    return $hari[date('w',$timestamp)].', '.date('j',$timestamp).' '.$bulan[date('n',$timestamp)].' '.date('Y',$timestamp).', '.date('H:i',$timestamp).' WITA';
-}
 
 // Tampilkan form tanggal
 echo html_writer::start_tag('form', ['method' => 'get', 'class' => 'mb-3']);
 
 // Tampilkan label dengan format Indonesia
 if (!empty($tanggal)) {
-    $bulan = [
-        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
-        '04' => 'April', '05' => 'Mei', '06' => 'Juni',
-        '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
-        '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-    ];
-    $parts = explode('-', $tanggal); // Format: YYYY-MM-DD
-    $tanggalindo = $parts[2] . ' ' . $bulan[$parts[1]] . ' ' . $parts[0];
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][date('w', $timestamp)];
-    echo html_writer::div("📅 Tanggal dipilih: <strong>$tanggalindo</strong> (Hari: <strong>$hari</strong>)", 'mb-2');
+   echo html_writer::div(
+    "📅 Tanggal dipilih: <strong>" . tanggal_indo($timestamp, 'judul') . "</strong>",
+    'mb-2'
+);
 
 }
 
@@ -101,7 +89,7 @@ if ($entries) {
             html_writer::tag('td', $e->matapelajaran),
             html_writer::tag('td', shorten_text($e->materi, 30), ['title' => $e->materi]),
             html_writer::tag('td', shorten_text($abtxt, 25), ['title' => $abtxt]),
-            html_writer::tag('td', format_waktu_indonesia($e->timecreated)),
+            html_writer::tag('td', tanggal_indo($e->timecreated)),
             html_writer::tag('td', shorten_text($e->keterangan, 25), ['title' => $e->keterangan])
         ]));
     }

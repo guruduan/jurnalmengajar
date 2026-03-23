@@ -144,4 +144,13 @@ else if ($data = $mform->get_data()) {
 
 // ====== Tampilkan form (awal/validasi) ======
 $mform->display();
+echo html_writer::link(
+    '#',
+    '⬅ Kembali',
+    [
+        'class' => 'btn btn-secondary',
+        'onclick' => 'history.back(); return false;',
+        'title' => 'Kembali ke halaman sebelumnya'
+    ]
+);
 echo $OUTPUT->footer();

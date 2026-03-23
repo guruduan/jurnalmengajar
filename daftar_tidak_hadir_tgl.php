@@ -1,10 +1,8 @@
+
 <?php
-// local/jurnalmengajar/daftar_tidak_hadir_tgl.php
-// Halaman: Daftar murid tidak hadir per tanggal
-// Kolom: No | Kelas (Nama Cohort) | Nama Murid | Absen | Jamke | Waktu Input
-// Fitur: Pilih tanggal, tampilkan data absen pada tanggal tersebut.
 
 require(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/lib.php');
 require_login();
 
 $context = context_system::instance();
@@ -27,21 +25,6 @@ try {
 }
 $start = (clone $selected)->setTime(0, 0, 0)->getTimestamp();
 $end   = (clone $selected)->setTime(23, 59, 59)->getTimestamp();
-
-$bulan_indo = [
-    '01' => 'Januari','02' => 'Februari','03' => 'Maret','04' => 'April',
-    '05' => 'Mei','06' => 'Juni','07' => 'Juli','08' => 'Agustus',
-    '09' => 'September','10' => 'Oktober','11' => 'November','12' => 'Desember'
-];
-$ymd = $selected->format('Y-m-d');
-[$yy, $mm, $dd] = explode('-', $ymd);
-$tanggalindo = $dd . ' ' . ($bulan_indo[$mm] ?? $mm) . ' ' . $yy;
-
-$hari_map = [
-    'Sunday' => 'Minggu','Monday' => 'Senin','Tuesday' => 'Selasa','Wednesday' => 'Rabu',
-    'Thursday' => 'Kamis','Friday' => 'Jumat','Saturday' => 'Sabtu'
-];
-$hari = $hari_map[$selected->format('l')] ?? $selected->format('l');
 
 global $DB;
 
@@ -117,41 +100,23 @@ function cohort_name_from_any($kelasraw, array &$cache, \moodle_database $DB): s
     return $kelas;
 }
 
-function format_tanggal_indo($timestamp, $tz = null): string {
-    if ($tz === null) $tz = new DateTimeZone('Asia/Makassar');
-    $dt = new DateTime("@$timestamp");
-    $dt->setTimezone($tz);
-
-    $hari = [
-        'Sunday' => 'Minggu','Monday' => 'Senin','Tuesday' => 'Selasa','Wednesday' => 'Rabu',
-        'Thursday' => 'Kamis','Friday' => 'Jumat','Saturday' => 'Sabtu'
-    ];
-    $bulan = [
-        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
-        7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
-    ];
-
-    $hariIndo = $hari[$dt->format('l')];
-    $tgl = (int)$dt->format('j');
-    $bulanIndo = $bulan[(int)$dt->format('n')];
-    $tahun = $dt->format('Y');
-
-    return "$hariIndo, $tgl $bulanIndo $tahun";
-}
-
-function format_jam_indo($timestamp, $tz = null): string {
-    if (!$timestamp) return '-';
-    if ($tz === null) $tz = new DateTimeZone('Asia/Makassar');
-    $dt = new DateTime("@$timestamp");
-    $dt->setTimezone($tz);
-    return $dt->format('H:i') . ' WITA';
-}
 
 // ==========================
 // Output
 // ==========================
 echo $OUTPUT->header();
-
+// Tombol kembali
+echo html_writer::div(
+    html_writer::link(
+        '#',
+        '⬅ Kembali',
+        [
+            'class' => 'btn btn-secondary',
+            'onclick' => 'history.back(); return false;'
+        ]
+    ),
+    'mb-3'
+);
 // 🔁 TAB SWITCH
 echo html_writer::start_div('mb-3 text-start');
 echo html_writer::link(
@@ -302,7 +267,7 @@ usort($rows, function($a, $b) {
 // Header tanggal
 echo html_writer::tag(
     'p',
-    html_writer::tag('strong', 'Hari/Tanggal: ') . format_tanggal_indo($selected->getTimestamp(), $tz),
+    html_writer::tag('strong', 'Hari/Tanggal: ') . tanggal_indo($selected->getTimestamp(), 'judul'),
     ['class' => 'mb-3']
 );
 
@@ -326,7 +291,7 @@ foreach ($rows as $r) {
         format_string($r->lastname),
         format_string($r->absen),
         format_string($r->jamke === '' ? '-' : $r->jamke),
-        format_string(format_jam_indo($r->timeinput, $tz)),
+        format_string(tanggal_indo($r->timeinput, 'jam')),
     ];
 }
 

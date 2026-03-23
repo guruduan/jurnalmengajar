@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
-
+require_once(__DIR__ . '/lib.php');
 require_login();
 
 $context = context_system::instance();
@@ -14,13 +14,6 @@ $PAGE->set_title('Manajemen Jurnal Mengajar');
 $PAGE->set_heading('Manajemen Jurnal Mengajar');
 
 global $DB;
-
-// fungsi waktu Indonesia
-function format_waktu_indonesia($timestamp) {
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
-    return $hari[date('w',$timestamp)].', '.date('j',$timestamp).' '.$bulan[date('n',$timestamp)].' '.date('Y',$timestamp).', '.date('H:i',$timestamp).' WITA';
-}
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading('📊 Semua Jurnal Guru');
@@ -104,7 +97,7 @@ if ($entries) {
         echo html_writer::tag('td', $e->matapelajaran);
         echo html_writer::tag('td', shorten_text($e->materi, 30), ['title' => $e->materi]);
         echo html_writer::tag('td', shorten_text($absentext, 25), ['title' => $absentext]);
-        echo html_writer::tag('td', format_waktu_indonesia($e->timecreated));
+        echo html_writer::tag('td', tanggal_indo($e->timecreated));
         echo html_writer::tag('td', $aksi);
 
         echo html_writer::end_tag('tr');

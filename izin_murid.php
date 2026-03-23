@@ -1,3 +1,4 @@
+
 <?php
 require_once('../../config.php');
 require_login();
@@ -106,7 +107,7 @@ if ($siswa) {
     $kelas = get_nama_kelas($record->kelasid);
     $nama  = ucwords(strtolower($siswa->lastname));
     $gurunama = $DB->get_field('user', 'lastname', ['id' => $record->guru_pengajar]);
-    $waktu_full = format_waktu_indo($record->timecreated);
+    $waktu_full = tanggal_indo($record->timecreated);
 
     $pesan = "*[Surat Izin Murid]*\n\n"
            . "📅 Waktu: $waktu_full\n"
@@ -307,30 +308,13 @@ if ($riwayatsurat) {
         'left'
     ];
 
-    date_default_timezone_set('Asia/Makassar');
-
-    $hari  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [
-        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
-        7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
-    ];
-
     $no = 1;
 
     foreach ($riwayatsurat as $s) {
 
         $kelasnama = get_nama_kelas($s->kelasid);
 
-        $ts = $s->timecreated;
-
-        $tgl_display = sprintf(
-            '%s, %d %s %d %s WITA',
-            $hari[date('w',$ts)],
-            date('j',$ts),
-            $bulan[date('n',$ts)],
-            date('Y',$ts),
-            date('H:i',$ts)
-        );
+        $tgl_display = tanggal_indo($s->timecreated);
 
         $table->data[] = [
             $no++,

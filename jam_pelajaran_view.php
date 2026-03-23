@@ -35,5 +35,13 @@ foreach ($jam as $j => $w) {
 }
 
 echo "</table>";
-
+echo html_writer::link(
+    '#',
+    '⬅ Kembali',
+    [
+        'class' => 'btn btn-secondary',
+        'onclick' => 'history.back(); return false;',
+        'title' => 'Kembali ke halaman sebelumnya'
+    ]
+);
 echo $OUTPUT->footer();

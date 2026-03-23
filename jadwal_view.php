@@ -13,15 +13,11 @@ $PAGE->set_title('Jadwal Mengajar');
 $PAGE->set_heading('Jadwal Mengajar');
 
 echo $OUTPUT->header();
-echo "<div style='margin-bottom:15px;'>";
-echo "<a href='/local/jurnalmengajar/jam_pelajaran_view.php' class='btn btn-primary'>Lihat Alokasi Jam Pelajaran</a> ";
-echo "</div>";
 
 global $USER;
 
-// Ambil jadwal dari CSV
+// Ambil jadwal dan jam pelajaran
 $jadwal = jurnalmengajar_get_jadwal_acuan();
-
 $jam_pelajaran = jurnalmengajar_generate_jam();
 
 // Ambil daftar guru unik
@@ -30,24 +26,53 @@ foreach ($jadwal as $j) {
     $daftarguru[$j['lastname']] = $j['lastname'];
 }
 
-// Default filter = guru yang login
+// Default filter guru
 $filterguru = $_GET['guru'] ?? $USER->lastname;
 
-// Form filter
-echo "<form method='get'>";
+
+// ===== Baris Filter kiri & Tombol kanan =====
+echo html_writer::start_tag('form', [
+    'method' => 'get',
+    'style' => 'display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;'
+]);
+
+// Kiri (Filter)
+echo html_writer::start_tag('div');
 echo "Filter Guru: ";
-echo "<select name='guru'>";
-echo "<option value=''>Semua Guru</option>";
+echo html_writer::select($daftarguru, 'guru', $filterguru);
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => 'Tampilkan',
+    'class' => 'btn btn-secondary',
+    'style' => 'margin-left:5px'
+]);
+echo html_writer::end_tag('div');
 
-foreach ($daftarguru as $g) {
-    $selected = ($filterguru == $g) ? 'selected' : '';
-    echo "<option value='$g' $selected>$g</option>";
-}
+// Kanan (Tombol)
+echo html_writer::start_tag('div', [
+    'style' => 'display:flex; gap:10px;'
+]);
 
-echo "</select>";
-echo " <input type='submit' value='Tampilkan' class='btn btn-secondary'>";
-echo "</form><br>";
+echo html_writer::link(
+    '#',
+    '⬅ Kembali',
+    [
+        'class' => 'btn btn-secondary',
+        'onclick' => 'history.back(); return false;'
+    ]
+);
 
+echo html_writer::link(
+    new moodle_url('/local/jurnalmengajar/jam_pelajaran_view.php'),
+    'Lihat Alokasi Jam Pelajaran',
+    ['class' => 'btn btn-primary']
+);
+
+echo html_writer::end_tag('div');
+echo html_writer::end_tag('form');
+
+
+// Urutan hari
 $hariurut = [
     'Senin' => 1,
     'Selasa' => 2,
@@ -55,19 +80,9 @@ $hariurut = [
     'Kamis' => 4,
     'Jumat' => 5
 ];
-
-$jadwal = jurnalmengajar_get_jadwal_acuan();
 
 // GROUPING
 $grouped = [];
-
-$hariurut = [
-    'Senin' => 1,
-    'Selasa' => 2,
-    'Rabu' => 3,
-    'Kamis' => 4,
-    'Jumat' => 5
-];
 
 foreach ($jadwal as $j) {
     $key = $j['hari'] . '|' . $j['lastname'] . '|' . $j['kelas'];
@@ -89,7 +104,8 @@ usort($grouped, function($a, $b) {
     return $a['hari_no'] <=> $b['hari_no'];
 });
 
-// Tabel jadwal
+
+// ===== Tabel Jadwal =====
 echo "<table class='generaltable'>";
 echo "<tr>
         <th>No</th>
@@ -102,7 +118,6 @@ echo "<tr>
 
 $no = 1;
 $hari_sebelumnya = '';
-
 $totaljam = 0;
 
 foreach ($grouped as $g) {
@@ -112,47 +127,47 @@ foreach ($grouped as $g) {
     }
 
     sort($g['jamke']);
-$jamgabung = implode(',', $g['jamke']);
+    $jamgabung = implode(',', $g['jamke']);
 
-$jamlist = $g['jamke'];
-$jamawal = min($jamlist);
-$jamakhir = max($jamlist);
+    $jamawal = min($g['jamke']);
+    $jamakhir = max($g['jamke']);
 
-$mulai = $jam_pelajaran[$jamawal]['mulai'] ?? '';
-$selesai = $jam_pelajaran[$jamakhir]['selesai'] ?? '';
+    $mulai = $jam_pelajaran[$jamawal]['mulai'] ?? '';
+    $selesai = $jam_pelajaran[$jamakhir]['selesai'] ?? '';
 
-$pukul = $mulai . ' - ' . $selesai;
+    $pukul = $mulai . ' - ' . $selesai;
 
-$jumlahjam = count($g['jamke']);
-$totaljam += $jumlahjam;
+    $jumlahjam = count($g['jamke']);
+    $totaljam += $jumlahjam;
 
-echo "<tr>";
+    echo "<tr>";
 
-if ($hari_sebelumnya != $g['hari']) {
-    echo "<td>$no</td>";
-    echo "<td>{$g['hari']}</td>";
-    $hari_sebelumnya = $g['hari'];
-    $no++;
-} else {
-    echo "<td></td>";
-    echo "<td></td>";
+    if ($hari_sebelumnya != $g['hari']) {
+        echo "<td>$no</td>";
+        echo "<td>{$g['hari']}</td>";
+        $hari_sebelumnya = $g['hari'];
+        $no++;
+    } else {
+        echo "<td></td>";
+        echo "<td></td>";
+    }
+
+    echo "<td>{$g['lastname']}</td>";
+    echo "<td>{$g['kelas']}</td>";
+    echo "<td>$jamgabung</td>";
+    echo "<td>$pukul</td>";
+
+    echo "</tr>";
 }
 
-echo "<td>{$g['lastname']}</td>";
-echo "<td>{$g['kelas']}</td>";
-echo "<td>$jamgabung</td>";
-echo "<td>$pukul</td>";
-
-echo "</tr>";
-}
-
+// Total jam
 echo "<tr style='font-weight:bold; background:#f8f9fa;'>";
-echo "<td></td>"; // kolom 1 No
-echo "<td></td>"; // kolom 2 Hari
-echo "<td style='text-align:left;'>Jumlah Jam Pelajaran</td>"; // kolom 3 Guru
-echo "<td></td>"; // kolom 4 Kelas
-echo "<td style='text-align:left;'>$totaljam Jam</td>"; // kolom 5 Jam
-echo "<td></td>"; // kolom 6 Pukul
+echo "<td></td>";
+echo "<td></td>";
+echo "<td>Jumlah Jam Pelajaran</td>";
+echo "<td></td>";
+echo "<td>$totaljam Jam</td>";
+echo "<td></td>";
 echo "</tr>";
 
 echo "</table>";

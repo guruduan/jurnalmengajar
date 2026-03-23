@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_login();
+require_once(__DIR__ . '/lib.php');
 
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:submit', $context);
@@ -22,9 +23,7 @@ echo ' ';
 echo html_writer::link(new moodle_url('/local/jurnalmengajar/bydate.php'), '📅 Ke Tanggal', ['class' => 'btn btn-outline-secondary']);
 echo html_writer::end_div();
 
-
 global $DB;
-date_default_timezone_set('Asia/Makassar');
 $start = strtotime('today midnight');
 $end = strtotime('tomorrow midnight') - 1;
 
@@ -34,12 +33,6 @@ $sql = "SELECT j.*, u.lastname
         WHERE j.timecreated BETWEEN :start AND :end
         ORDER BY j.timecreated ASC";
 $entries = $DB->get_records_sql($sql, ['start' => $start, 'end' => $end]);
-
-function format_waktu_indonesia($timestamp) {
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
-    return $hari[date('w',$timestamp)].', '.date('j',$timestamp).' '.$bulan[date('n',$timestamp)].' '.date('Y',$timestamp).', '.date('H:i',$timestamp).' WITA';
-}
 
 if ($entries) {
     echo html_writer::start_tag('table', ['class' => 'generaltable']);
@@ -61,7 +54,7 @@ if ($entries) {
             html_writer::tag('td', $e->matapelajaran),
             html_writer::tag('td', shorten_text($e->materi, 30), ['title' => $e->materi]),
             html_writer::tag('td', shorten_text($abtxt, 25), ['title' => $abtxt]),
-            html_writer::tag('td', format_waktu_indonesia($e->timecreated)),
+            html_writer::tag('td', tanggal_indo($e->timecreated)),
             html_writer::tag('td', shorten_text($e->keterangan, 25), ['title' => $e->keterangan])
         ]));
     }

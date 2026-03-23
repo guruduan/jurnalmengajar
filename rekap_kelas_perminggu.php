@@ -7,11 +7,10 @@ require_capability('local/jurnalmengajar:view', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/jurnalmengajar/rekap_kelas_perminggu.php'));
-$PAGE->set_title('Rekap KBM di Kelas Per Minggu');
-$PAGE->set_heading('Rekap KBM di Kelas Per Minggu');
+$PAGE->set_title('Rekap Pekanan KBM Kelas');
+$PAGE->set_heading('Rekap Pekanan KBM Kelas');
 
 global $DB, $OUTPUT;
-
 // === Ambil setting tanggal awal minggu ===
 $tanggalawalminggu = get_config('local_jurnalmengajar', 'tanggalawalminggu'); // format: YYYY-MM-DD
 if (empty($tanggalawalminggu)) {
@@ -63,6 +62,19 @@ if ($kelas) {
 
 // === Cetak form filter ===
 echo $OUTPUT->header();
+// Tombol kembali
+echo html_writer::div(
+    html_writer::link(
+        '#',
+        '⬅ Kembali',
+        [
+            'class' => 'btn btn-secondary',
+            'onclick' => 'history.back(); return false;'
+        ]
+    ),
+    'mb-3'
+);
+echo $OUTPUT->heading('Rekap KBM di kelas per minggu');
 echo html_writer::start_tag('form', ['method' => 'get']);
 echo html_writer::tag('label', 'Pilih Kelas: ', ['for' => 'kelas']);
 echo html_writer::select($kelasoptions, 'kelas', $kelas);

@@ -64,7 +64,18 @@ if (!empty($all_userids)) {
 
 // Tampilkan header dan form filter
 echo $OUTPUT->header();
-
+// Tombol kembali
+echo html_writer::div(
+    html_writer::link(
+        '#',
+        '⬅ Kembali',
+        [
+            'class' => 'btn btn-secondary',
+            'onclick' => 'history.back(); return false;'
+        ]
+    ),
+    'mb-3'
+);
 echo html_writer::tag('h3', "Rekap Minggu ke-$mingguke (" . 
     $awal_minggu->format('d M') . " - " . 
     $akhir_minggu->format('d M Y') . ")");

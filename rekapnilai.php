@@ -189,7 +189,18 @@ if ($export === 'csv' && !empty($cohortid)) {
 
 // ====== Mulai output HTML ======
 echo $OUTPUT->header();
-
+// Tombol kembali
+echo html_writer::div(
+    html_writer::link(
+        '#',
+        '⬅ Kembali',
+        [
+            'class' => 'btn btn-secondary',
+            'onclick' => 'history.back(); return false;'
+        ]
+    ),
+    'mb-3'
+);
 // Form filter (GET)
 $url = new moodle_url('/local/jurnalmengajar/rekapnilai.php');
 echo html_writer::start_tag('form', ['method' => 'get', 'action' => $url, 'class' => 'mform']);

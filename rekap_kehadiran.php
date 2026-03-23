@@ -14,6 +14,18 @@ $PAGE->requires->jquery();
 //$PAGE->requires->css('/local/jurnalmengajar/css/stickyheader.css');
 
 echo $OUTPUT->header();
+// Tombol kembali
+echo html_writer::div(
+    html_writer::link(
+        '#',
+        '⬅ Kembali',
+        [
+            'class' => 'btn btn-secondary',
+            'onclick' => 'history.back(); return false;'
+        ]
+    ),
+    'mb-3'
+);
 echo $OUTPUT->heading('Rekap Kehadiran Murid Per Kelas');
 
 // Ambil daftar kelas

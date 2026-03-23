@@ -3,6 +3,36 @@ defined('MOODLE_INTERNAL') || die();
 date_default_timezone_set('Asia/Makassar');
 
 /**
+ * Format tanggal Indonesia
+ */
+function tanggal_indo($timestamp = null, $mode = 'full') {
+    $timestamp = $timestamp ?: time();
+
+    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    $bulan = [
+        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
+        7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+    ];
+
+    if ($mode == 'judul') {
+        return $hari[date('w',$timestamp)] . ' ' .
+               date('j',$timestamp) . ' ' .
+               $bulan[date('n',$timestamp)] . ' ' .
+               date('Y',$timestamp);
+    }
+
+    if ($mode == 'jam') {
+        return date('H:i', $timestamp);
+    }
+
+    return $hari[date('w',$timestamp)] . ', ' .
+           date('j',$timestamp) . ' ' .
+           $bulan[date('n',$timestamp)] . ' ' .
+           date('Y',$timestamp) .
+           ' Pukul ' . date('H:i',$timestamp) . ' WITA';
+}
+
+/**
  * Ambil nama kelas dari ID cohort
  */
 function get_nama_kelas($id) {
@@ -36,48 +66,35 @@ function get_user_nowa($userid) {
 }
 
 /**
- * Format waktu Indonesia
+ * Cek tanggal libur
  */
-function format_waktu_indo($timestamp) {
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [
-        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
-        7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
-    ];
+function jurnalmengajar_cek_libur($tanggal) {
+    $tanggallibur = get_config('local_jurnalmengajar', 'tanggallibur');
 
-    return $hari[date('w',$timestamp)] . ', ' .
-           date('j',$timestamp) . ' ' .
-           $bulan[date('n',$timestamp)] . ' ' .
-           date('Y',$timestamp) .
-           ' Pukul ' . date('H:i',$timestamp) . ' WITA';
-}
+    if (empty($tanggallibur)) return false;
 
-/**
- * Format tanggal judul
- */
-function format_tanggal_judul($timestamp = null) {
-    $timestamp = $timestamp ?: time();
+    $lines = preg_split('/\r\n|\r|\n/', $tanggallibur);
 
-    $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $bulan = [
-        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
-        7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
-    ];
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line == '') continue;
 
-    return $hari[date('w',$timestamp)] . ' ' .
-           date('j',$timestamp) . ' ' .
-           $bulan[date('n',$timestamp)] . ' ' .
-           date('Y',$timestamp);
-}
+        if (stripos($line, 's/d') !== false) {
+            list($start, $end) = explode('s/d', $line);
+            $start = trim($start);
+            $end   = trim($end);
 
-/**
- * Format jam saja
- */
-function format_jam($timestamp = null) {
-    if (!$timestamp) {
-        $timestamp = time();
+            if ($tanggal >= $start && $tanggal <= $end) {
+                return true;
+            }
+        } else {
+            if ($tanggal == $line) {
+                return true;
+            }
+        }
     }
-    return date('H:i', $timestamp);
+
+    return false;
 }
 
 /**
@@ -85,34 +102,19 @@ function format_jam($timestamp = null) {
  */
 function jurnalmengajar_boleh_kirim_wa() {
 
-    // ======================
-    // Cek hari sekolah
-    // ======================
     $hariIndoList = [
-        1 => 'Senin',
-        2 => 'Selasa',
-        3 => 'Rabu',
-        4 => 'Kamis',
-        5 => 'Jumat',
-        6 => 'Sabtu',
-        7 => 'Minggu'
+        1=>'Senin',2=>'Selasa',3=>'Rabu',
+        4=>'Kamis',5=>'Jumat',6=>'Sabtu',7=>'Minggu'
     ];
-
-    $hariIndo = $hariIndoList[(int)date('N')];
 
     $hariSekolah = get_config('local_jurnalmengajar', 'harisekolah');
     $hariSekolah = array_map('trim', explode(',', $hariSekolah));
 
-    if (!in_array($hariIndo, $hariSekolah)) {
+    if (!in_array($hariIndoList[(int)date('N')], $hariSekolah)) {
         return false;
     }
 
-    // ======================
-    // Cek tanggal libur
-    // ======================
-    $tanggal = date('Y-m-d');
-
-    if (function_exists('jurnalmengajar_cek_libur') && jurnalmengajar_cek_libur($tanggal)) {
+    if (jurnalmengajar_cek_libur(date('Y-m-d'))) {
         return false;
     }
 
@@ -133,36 +135,25 @@ function jurnalmengajar_kirim_wa($nomor, $pesan) {
     $logfile = $logdir . '/wa_debug.log';
 
     file_put_contents($logfile,
-        date('Y-m-d H:i:s') . " | Mulai kirim WA ke $nomor\n",
+        date('Y-m-d H:i:s') . " | Kirim WA ke $nomor\n",
         FILE_APPEND
     );
 
-    // CEK BOLEH KIRIM
     if (!jurnalmengajar_boleh_kirim_wa()) {
         file_put_contents($logfile,
-            date('Y-m-d H:i:s') . " | DIBATALKAN: Hari libur / bukan hari sekolah\n",
+            date('Y-m-d H:i:s') . " | DIBATALKAN: Hari libur\n",
             FILE_APPEND
         );
         return false;
     }
 
-    file_put_contents($logfile,
-        date('Y-m-d H:i:s') . " | Lolos filter hari sekolah\n",
-        FILE_APPEND
-    );
-
     $apikey = get_config('local_jurnalmengajar', 'apikey');
     $secret = get_config('local_jurnalmengajar', 'secretkey');
     $wablas_url = get_config('local_jurnalmengajar', 'wablas_url');
 
-    file_put_contents($logfile,
-        date('Y-m-d H:i:s') . " | URL: $wablas_url\n",
-        FILE_APPEND
-    );
-
     if (empty($apikey) || empty($secret)) {
         file_put_contents($logfile,
-            date('Y-m-d H:i:s') . " | ERROR: API key kosong\n",
+            date('Y-m-d H:i:s') . " | ERROR API KEY\n",
             FILE_APPEND
         );
         return false;
@@ -192,19 +183,6 @@ function jurnalmengajar_kirim_wa($nomor, $pesan) {
     ]);
 
     $response = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-        file_put_contents($logfile,
-            date('Y-m-d H:i:s') . " | CURL ERROR: " . curl_error($ch) . "\n",
-            FILE_APPEND
-        );
-    } else {
-        file_put_contents($logfile,
-            date('Y-m-d H:i:s') . " | RESPONSE: $response\n",
-            FILE_APPEND
-        );
-    }
-
     curl_close($ch);
 
     return $response;
@@ -218,7 +196,6 @@ function get_nomor_wali_kelas($kelasid) {
     $mapping = json_decode($json, true);
 
     if (empty($mapping[$kelasid])) {
-        debugging("Mapping tidak ditemukan untuk kelas ID: $kelasid", DEBUG_DEVELOPER);
         return null;
     }
 
@@ -240,15 +217,14 @@ function jurnalmengajar_notifikasi_wa($data, $user) {
     $mapel = $data->matapelajaran ?? '-';
     $materi = $data->materi ?? '-';
     $aktivitas = $data->aktivitas ?? '-';
-    $keterangan = $data->keterangan ?? '-';
 
     $sekolah = get_config('local_jurnalmengajar', 'nama_sekolah') ?: 'Nama Sekolah';
 
-    $tanggal_judul = format_tanggal_judul();
-    $jam = format_jam();
+    $tanggal = tanggal_indo(time(), 'judul');
+    $jam = tanggal_indo(time(), 'jam');
 
-    $pesan = "*📘 Jurnal KBM $tanggal_judul*\n\n"
-       . "👤 Guru yang mengajar: $namaguru\n"
+    $pesan = "*📘 Jurnal KBM $tanggal*\n\n"
+       . "👤 Guru: $namaguru\n"
        . "🏫 Kelas: $kelas\n"
        . "⏰ Jam ke: $jamke\n"
        . "📚 Mata Pelajaran: $mapel\n"
@@ -260,69 +236,12 @@ function jurnalmengajar_notifikasi_wa($data, $user) {
     $nomor_guru = get_user_nowa($user->id);
     $nomor_wali = get_nomor_wali_kelas($kelasid);
 
-    if ($nomor_guru && $nomor_guru === $nomor_wali) {
-        jurnalmengajar_kirim_wa($nomor_guru, $pesan);
-    } else {
-        if ($nomor_guru) jurnalmengajar_kirim_wa($nomor_guru, $pesan);
-        if ($nomor_wali) jurnalmengajar_kirim_wa($nomor_wali, $pesan);
+    $tujuan = [];
+
+    if ($nomor_guru) $tujuan[] = $nomor_guru;
+    if ($nomor_wali && $nomor_wali != $nomor_guru) $tujuan[] = $nomor_wali;
+
+    foreach ($tujuan as $no) {
+        jurnalmengajar_kirim_wa($no, $pesan);
     }
-}
-
-/**
- * Ambil URL logo
- */
-function jurnalmengajar_get_logo_url() {
-    global $CFG;
-
-    $context = context_system::instance();
-    $fs = get_file_storage();
-
-    $files = $fs->get_area_files(
-        $context->id,
-        'local_jurnalmengajar',
-        'logo',
-        0,
-        'itemid, filepath, filename',
-        false
-    );
-
-    foreach ($files as $file) {
-        return moodle_url::make_pluginfile_url(
-            $file->get_contextid(),
-            $file->get_component(),
-            $file->get_filearea(),
-            0,
-            $file->get_filepath(),
-            $file->get_filename()
-        );
-    }
-
-    return '';
-}
-
-/**
- * Ambil path stempel
- */
-function jurnalmengajar_get_stempel_path() {
-    global $CFG;
-
-    $context = context_system::instance();
-    $fs = get_file_storage();
-
-    $files = $fs->get_area_files(
-        $context->id,
-        'local_jurnalmengajar',
-        'stempel',
-        0,
-        'itemid, filepath, filename',
-        false
-    );
-
-    foreach ($files as $file) {
-        $temp = $CFG->tempdir . '/' . $file->get_filename();
-        $file->copy_content_to($temp);
-        return $temp;
-    }
-
-    return '';
 }

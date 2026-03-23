@@ -110,7 +110,7 @@ class jw_form extends moodleform {
         $m = $this->_form;
 
         $now = time();
-        $m->addElement('static', 'waktu', 'Waktu', format_waktu_indo($now));
+        $m->addElement('static', 'waktu', 'Waktu', tanggal_indo($now));
 
         $muridopts = jw_get_murid_options_from_csv($USER->id);
 
@@ -228,7 +228,7 @@ if (empty($muridids)) {
         $kelas = jw_get_kelas_siswa($muridid);
 
         $pesan = "*📋 Jurnal Guru Wali*\n\n"
-               . "📅 Waktu: ".format_waktu_indo($now)."\n"
+               . "📅 Waktu: ".tanggal_indo($now)."\n"
                . "👤 Murid: ".ucwords(strtolower($murid->lastname))."\n"
                . "🏫 Kelas: ".$kelas."\n"
                . "🧩 Topik: ".$data->topik."\n"
@@ -278,7 +278,7 @@ $aksi = html_writer::link($editurl, '✏️ Edit');
 
     $table->data[] = [
         $no++,
-        format_waktu_indo($r->timecreated),
+        tanggal_indo($r->timecreated),
         s($r->lastname),
         s($kelas),
 	s($r->topik),
@@ -304,5 +304,14 @@ echo html_writer::tag('button', '<strong>💾 Ekspor Jurnal Guru Wali per Bulan<
 
 echo html_writer::end_tag('form');
 echo html_writer::end_div();
+echo html_writer::link(
+    '#',
+    '⬅ Kembali',
+    [
+        'class' => 'btn btn-secondary',
+        'onclick' => 'history.back(); return false;',
+        'title' => 'Kembali ke halaman sebelumnya'
+    ]
+);
 
 echo $OUTPUT->footer();
