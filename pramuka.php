@@ -111,7 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                . "🙍‍♂️ Tidak hadir: $daftarabsen\n\n"
                . "_Dikirim kepada Wali kelas sebagai laporan_";
 
-        jurnalmengajar_kirim_wa($nomorwa, $pesan);
+$tujuan = [$nomorwa];
+jurnalmengajar_kirim_wa($tujuan, $pesan);
     }
 
     redirect(new moodle_url('/local/jurnalmengajar/pramuka.php'), 'Jurnal pramuka berhasil disimpan');

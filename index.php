@@ -2,10 +2,6 @@
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
-if (\core_useragent::is_moodle_app()) {
-    redirect(new moodle_url('/local/jurnalmengajar/mobile.php'));
-}
-
 use local_jurnalmengajar\form\jurnal_form;
 
 $context = context_system::instance();
@@ -121,8 +117,61 @@ if ($mform->is_cancelled()) {
     // Simpan ke database
     $DB->insert_record('local_jurnalmengajar', $record);
 
-    // Kirim notifikasi WA (filter hari libur sudah di lib.php)
-    jurnalmengajar_notifikasi_wa($record, $USER);
+    // ================= KIRIM NOTIF WA =================
+$kelasid = $record->kelas ?? null;
+
+if ($kelasid) {
+
+    $namaguru = !empty($USER->lastname) ? $USER->lastname : $USER->firstname;
+    $kelas = get_nama_kelas($kelasid);
+
+    $jamke = $record->jamke ?? '-';
+    $mapel = $record->matapelajaran ?? '-';
+    $materi = $record->materi ?? '-';
+    $aktivitas = $record->aktivitas ?? '-';
+
+    $absenjson = $record->absen ?? '{}';
+    $absenarr = json_decode($absenjson, true);
+
+    $absen = '-';
+    if (!empty($absenarr)) {
+        $formatted = [];
+        $no = 1;
+        foreach ($absenarr as $nama => $alasan) {
+            $formatted[] = $no++ . ". {$nama}: {$alasan}";
+        }
+        $absen = implode("\n", $formatted);
+    }
+
+    $keterangan = $record->keterangan ?? '-';
+
+    $sekolah = get_config('local_jurnalmengajar', 'nama_sekolah') ?: 'Nama Sekolah';
+
+    $tanggal = tanggal_indo(time(), 'judul');
+    $jam = tanggal_indo(time(), 'jam');
+
+    $pesan = "*📘 Jurnal KBM _{$tanggal}_*\n\n"
+       . "👤 Guru: $namaguru\n"
+       . "🏫 Kelas: $kelas\n"
+       . "⏰ Jam ke: $jamke\n"
+       . "📚 Mata Pelajaran: $mapel\n"
+       . "📒 Materi: $materi\n"
+       . "📝 Aktivitas:\n$aktivitas\n\n"
+       . "🔴 Murid tidak hadir:\n$absen\n\n"
+       . "Keterangan tambahan:\n$keterangan\n\n"
+       . "🕒 Waktu: $jam WITA\n"
+       . "📌 Tercatat di eJurnal KBM $sekolah\n\n"
+       . "_Dikirim ke Wali kelas dan Guru ybs sebagai laporan_";
+
+    // Tujuan
+    $tujuan = [
+        get_user_nowa($USER->id),
+        get_nomor_wali_kelas($kelasid)
+    ];
+
+    // Kirim WA
+    jurnalmengajar_kirim_wa($tujuan, $pesan);
+}
 
     redirect(
         new moodle_url('/local/jurnalmengajar/index.php'),

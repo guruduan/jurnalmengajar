@@ -236,11 +236,11 @@ if (empty($muridids)) {
                . "📝 Keterangan: ".$data->keterangan."\n"
                . "👨‍🏫 Guru Wali: ".$USER->lastname;
 
-        $nomorwa = get_nomor_wali_kelas($kelas);
+        $tujuan = [
+    get_nomor_wali_kelas($kelas)
+];
 
-        if ($nomorwa) {
-            jurnalmengajar_kirim_wa($nomorwa, $pesan);
-        }
+jurnalmengajar_kirim_wa($tujuan, $pesan);
     }
 
     redirect($PAGE->url, 'Data berhasil disimpan');

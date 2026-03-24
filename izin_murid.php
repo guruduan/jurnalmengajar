@@ -1,4 +1,3 @@
-
 <?php
 require_once('../../config.php');
 require_login();
@@ -109,7 +108,7 @@ if ($siswa) {
     $gurunama = $DB->get_field('user', 'lastname', ['id' => $record->guru_pengajar]);
     $waktu_full = tanggal_indo($record->timecreated);
 
-    $pesan = "*[Surat Izin Murid]*\n\n"
+    $pesan = "*📄 Surat Izin Murid*\n\n"
            . "📅 Waktu: $waktu_full\n"
            . "👤 Nama: $nama\n"
            . "🏫 Kelas: $kelas\n"
@@ -119,11 +118,11 @@ if ($siswa) {
            . "✍️ Pengawas Hari ini: $pengawas\n\n"
            . "_Dikirim kepada Wali kelas sebagai laporan_";
 
-    $nomor_wali = get_nomor_wali_kelas($record->kelasid);
+$tujuan = [
+    get_nomor_wali_kelas($record->kelasid)
+];
 
-    if ($nomor_wali) {
-        jurnalmengajar_kirim_wa($nomor_wali, $pesan);
-    }
+jurnalmengajar_kirim_wa($tujuan, $pesan);
 }
 
     // ================= REDIRECT =================
@@ -339,4 +338,3 @@ if ($riwayatsurat) {
 }
 
 // ================= FOOTER =================
-echo $OUTPUT->footer();

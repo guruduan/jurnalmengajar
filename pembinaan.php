@@ -89,7 +89,8 @@ if ($mform->is_cancelled()) {
                . "👤 Guru BK: $nama\n\n"
                . "_Dikirim kepada Wali kelas sebagai laporan_";
 
-        jurnalmengajar_kirim_wa($nomorwa, $pesan);
+$tujuan = [$nomorwa];
+jurnalmengajar_kirim_wa($tujuan, $pesan);
 
     } else {
         debugging("Nomor WA wali kelas tidak ditemukan untuk kelas ID: {$record->kelas}", DEBUG_DEVELOPER);

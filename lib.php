@@ -20,7 +20,11 @@ function tanggal_indo($timestamp = null, $mode = 'full') {
                $bulan[date('n',$timestamp)] . ' ' .
                date('Y',$timestamp);
     }
-
+if ($mode == 'tanggal') {
+    return date('j',$timestamp) . ' ' .
+           $bulan[date('n',$timestamp)] . ' ' .
+           date('Y',$timestamp);
+}
     if ($mode == 'jam') {
         return date('H:i', $timestamp);
     }
@@ -62,6 +66,34 @@ function get_user_nowa($userid) {
         return null;
     }
 
+    return preg_replace('/[^0-9]/', '', $nowa);
+}
+
+/**
+ * Ambil nomor wali kelas dari mapping
+ */
+function get_nomor_wali_kelas($kelasid) {
+    $json = get_config('local_jurnalmengajar', 'wali_kelas_mapping');
+    $mapping = json_decode($json, true);
+
+    if (empty($mapping[$kelasid])) {
+        return null;
+    }
+
+    return get_user_nowa($mapping[$kelasid]);
+}
+
+/**
+ * Ambil nomor kepala sekolah dari setting plugin
+ */
+function get_nomor_kepala_sekolah() {
+    $nowa = get_config('local_jurnalmengajar', 'nomor_kepsek');
+
+    if (empty($nowa)) {
+        return null;
+    }
+
+    // bersihkan selain angka
     return preg_replace('/[^0-9]/', '', $nowa);
 }
 
@@ -124,9 +156,18 @@ function jurnalmengajar_boleh_kirim_wa() {
 /**
  * Kirim WhatsApp via Wablas
  */
-function jurnalmengajar_kirim_wa($nomor, $pesan) {
+function jurnalmengajar_kirim_wa($tujuan, $pesan) {
     global $CFG;
 
+    // Pastikan array
+    if (!is_array($tujuan)) {
+        $tujuan = [$tujuan];
+    }
+
+    // Hapus duplikat
+    $tujuan = array_unique($tujuan);
+
+    // Siapkan log
     $logdir = $CFG->dataroot . '/logs';
     if (!file_exists($logdir)) {
         mkdir($logdir, 0777, true);
@@ -134,19 +175,16 @@ function jurnalmengajar_kirim_wa($nomor, $pesan) {
 
     $logfile = $logdir . '/wa_debug.log';
 
-    file_put_contents($logfile,
-        date('Y-m-d H:i:s') . " | Kirim WA ke $nomor\n",
-        FILE_APPEND
-    );
-
+    // Cek boleh kirim WA
     if (!jurnalmengajar_boleh_kirim_wa()) {
         file_put_contents($logfile,
-            date('Y-m-d H:i:s') . " | DIBATALKAN: Hari libur\n",
+            date('Y-m-d H:i:s') . " | DIBATALKAN: Hari libur / bukan hari sekolah\n",
             FILE_APPEND
         );
         return false;
     }
 
+    // Ambil config Wablas
     $apikey = get_config('local_jurnalmengajar', 'apikey');
     $secret = get_config('local_jurnalmengajar', 'secretkey');
     $wablas_url = get_config('local_jurnalmengajar', 'wablas_url');
@@ -160,6 +198,29 @@ function jurnalmengajar_kirim_wa($nomor, $pesan) {
     }
 
     $token = $apikey . '.' . $secret;
+file_put_contents($logfile,
+    "----------------------------------------\n" .
+    date('Y-m-d H:i:s') . " | Mulai kirim notifikasi\n",
+    FILE_APPEND
+);
+file_put_contents($logfile,
+    date('Y-m-d H:i:s') . " | Pesan: " . str_replace("\n"," | ",$pesan) . "\n",
+    FILE_APPEND
+);
+foreach ($tujuan as $nomor) {
+
+    if (empty($nomor)) {
+        file_put_contents($logfile,
+            date('Y-m-d H:i:s') . " | Nomor kosong, dilewati\n",
+            FILE_APPEND
+        );
+        continue;
+    }
+
+    file_put_contents($logfile,
+        date('Y-m-d H:i:s') . " | Kirim WA ke $nomor\n",
+        FILE_APPEND
+    );
 
     $data = [
         'data' => [[
@@ -185,63 +246,11 @@ function jurnalmengajar_kirim_wa($nomor, $pesan) {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    return $response;
+    file_put_contents($logfile,
+        date('Y-m-d H:i:s') . " | Response: $response\n",
+        FILE_APPEND
+    );
 }
-
-/**
- * Ambil nomor wali kelas dari mapping
- */
-function get_nomor_wali_kelas($kelasid) {
-    $json = get_config('local_jurnalmengajar', 'wali_kelas_mapping');
-    $mapping = json_decode($json, true);
-
-    if (empty($mapping[$kelasid])) {
-        return null;
-    }
-
-    return get_user_nowa($mapping[$kelasid]);
-}
-
-/**
- * Notifikasi WA Jurnal KBM
- */
-function jurnalmengajar_notifikasi_wa($data, $user) {
-
-    $kelasid = $data->kelas ?? null;
-    if (!$kelasid) return;
-
-    $namaguru = !empty($user->lastname) ? $user->lastname : $user->firstname;
-    $kelas = get_nama_kelas($kelasid);
-
-    $jamke = $data->jamke ?? '-';
-    $mapel = $data->matapelajaran ?? '-';
-    $materi = $data->materi ?? '-';
-    $aktivitas = $data->aktivitas ?? '-';
-
-    $sekolah = get_config('local_jurnalmengajar', 'nama_sekolah') ?: 'Nama Sekolah';
-
-    $tanggal = tanggal_indo(time(), 'judul');
-    $jam = tanggal_indo(time(), 'jam');
-
-    $pesan = "*📘 Jurnal KBM $tanggal*\n\n"
-       . "👤 Guru: $namaguru\n"
-       . "🏫 Kelas: $kelas\n"
-       . "⏰ Jam ke: $jamke\n"
-       . "📚 Mata Pelajaran: $mapel\n"
-       . "📒 Materi: $materi\n"
-       . "📝 Aktivitas:\n$aktivitas\n\n"
-       . "🕒 Waktu: $jam WITA\n"
-       . "📌 Tercatat di eJurnal KBM $sekolah";
-
-    $nomor_guru = get_user_nowa($user->id);
-    $nomor_wali = get_nomor_wali_kelas($kelasid);
-
-    $tujuan = [];
-
-    if ($nomor_guru) $tujuan[] = $nomor_guru;
-    if ($nomor_wali && $nomor_wali != $nomor_guru) $tujuan[] = $nomor_wali;
-
-    foreach ($tujuan as $no) {
-        jurnalmengajar_kirim_wa($no, $pesan);
-    }
+// PENUTUP FUNGSI (INI YANG SERING KURANG)
+return true;
 }
