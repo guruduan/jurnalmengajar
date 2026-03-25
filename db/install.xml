@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/jurnalmengajar/db"
-       VERSION="2026030200"
-       COMMENT="Final production schema Jurnal Mengajar"
+       VERSION="2026032500"
+       COMMENT="Final production schema Jurnal Mengajar Sesudah diperbaiki"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
 
@@ -33,6 +33,42 @@
 </TABLE>
 
 <!-- ========================= -->
+<!-- BEBAN MENGAJAR -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalmengajar_beban">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="jam_perminggu" TYPE="int" LENGTH="11" NOTNULL="true"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+</TABLE>
+
+<!-- ========================= -->
+<!-- JADWAL MENGAJAR -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalmengajar_jadwal">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="hari" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="kelas" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="jamke" TYPE="int" LENGTH="2" NOTNULL="true"/>
+<FIELD NAME="ruang" TYPE="char" LENGTH="20"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19"/>
+<FIELD NAME="timemodified" TYPE="int" LENGTH="19"/>
+</FIELDS>
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
+</TABLE>
+
+<!-- ========================= -->
 <!-- SURAT IZIN SISWA -->
 <!-- ========================= -->
 <TABLE NAME="local_jurnalmengajar_suratizin">
@@ -46,12 +82,19 @@
 <FIELD NAME="penginput" TYPE="int" LENGTH="19" NOTNULL="true"/>
 <FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
 </FIELDS>
+
 <KEYS>
 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
 </KEYS>
+
 <INDEXES>
 <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+<INDEX NAME="kelasid_idx" UNIQUE="false" FIELDS="kelasid"/>
+<INDEX NAME="guru_pengajar_idx" UNIQUE="false" FIELDS="guru_pengajar"/>
+<INDEX NAME="penginput_idx" UNIQUE="false" FIELDS="penginput"/>
+<INDEX NAME="timecreated_idx" UNIQUE="false" FIELDS="timecreated"/>
 </INDEXES>
+
 </TABLE>
 
 <!-- ========================= -->
@@ -64,11 +107,16 @@
 <FIELD NAME="alasan" TYPE="text" NOTNULL="true"/>
 <FIELD NAME="keperluan" TYPE="text" NOTNULL="true"/>
 <FIELD NAME="waktuinput" TYPE="int" LENGTH="19" NOTNULL="true"/>
-<FIELD NAME="nip" TYPE="char" LENGTH="50"/>
+<FIELD NAME="nip" TYPE="char" LENGTH="50" NOTNULL="false"/>
 </FIELDS>
+
 <KEYS>
 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
 </KEYS>
+
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
 </TABLE>
 
 <!-- ========================= -->
@@ -133,6 +181,57 @@
 <INDEXES>
 <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
 </INDEXES>
+</TABLE>
+
+<!-- ========================= -->
+<!-- JURNAL PEMBINAAN -->
+<!-- ========================= -->
+<TABLE NAME="local_jurnalpembinaan">
+<FIELDS>
+<FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+<FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+<FIELD NAME="kelas" TYPE="char" LENGTH="20" NOTNULL="true"/>
+<FIELD NAME="peserta" TYPE="text" NOTNULL="false"/>
+<FIELD NAME="permasalahan" TYPE="text" NOTNULL="false"/>
+<FIELD NAME="tindakan" TYPE="text" NOTNULL="false"/>
+<FIELD NAME="tempat" TYPE="char" LENGTH="255" NOTNULL="false"/>
+<FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true"/>
+</FIELDS>
+
+<KEYS>
+<KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+</KEYS>
+
+<INDEXES>
+<INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+</INDEXES>
+</TABLE>
+
+<!-- ========================= -->
+<!-- NILAI HARIAN -->
+<!-- ========================= -->
+<TABLE NAME="local_jm_nilaiharian">
+    <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="19" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="19" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="19" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+        <FIELD NAME="mapel" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="cohortid" TYPE="int" LENGTH="19" NOTNULL="true"/>
+        <FIELD NAME="kelas" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="tanggal" TYPE="char" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="nilaijson" TYPE="text" NOTNULL="false"/>
+    </FIELDS>
+
+    <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    </KEYS>
+
+    <INDEXES>
+        <INDEX NAME="userid_idx" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="cohortid_idx" UNIQUE="false" FIELDS="cohortid"/>
+        <INDEX NAME="tanggal_idx" UNIQUE="false" FIELDS="tanggal"/>
+    </INDEXES>
 </TABLE>
 
 </TABLES>

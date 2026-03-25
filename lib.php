@@ -97,6 +97,60 @@ function get_nomor_kepala_sekolah() {
     return preg_replace('/[^0-9]/', '', $nowa);
 }
 
+// fungsi hari sekolah
+function jurnalmengajar_get_hari_sekolah() {
+    $hari = get_config('local_jurnalmengajar', 'harisekolah');
+
+    if (empty($hari)) {
+        $hari = 'Senin,Selasa,Rabu,Kamis,Jumat';
+    }
+
+    $hari_array = explode(',', $hari);
+
+    $result = [];
+    foreach ($hari_array as $h) {
+        $h = trim($h);
+        $result[$h] = $h;
+    }
+
+    return $result;
+}
+
+//Fungsi urutan hari
+function jurnalmengajar_get_urutan_hari() {
+    $hari = get_config('local_jurnalmengajar', 'harisekolah');
+
+    if (empty($hari)) {
+        $hari = 'Senin,Selasa,Rabu,Kamis,Jumat';
+    }
+
+    $hari_array = explode(',', $hari);
+
+    $urut = [];
+    $no = 1;
+
+    foreach ($hari_array as $h) {
+        $urut[trim($h)] = $no;
+        $no++;
+    }
+
+    return $urut;
+}
+
+//Fungsi hari ini
+function jurnalmengajar_get_hari_ini() {
+    $map = [
+        'Monday' => 'Senin',
+        'Tuesday' => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday' => 'Kamis',
+        'Friday' => 'Jumat',
+        'Saturday' => 'Sabtu',
+        'Sunday' => 'Minggu'
+    ];
+
+    return $map[date('l')] ?? '';
+}
 /**
  * Cek tanggal libur
  */

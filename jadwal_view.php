@@ -2,6 +2,7 @@
 require('../../config.php');
 require_once(__DIR__.'/jadwal_acuan_lib.php');
 require_once(__DIR__.'/jam_pelajaran_lib.php');
+require_once(__DIR__.'/lib.php');
 
 require_login();
 
@@ -23,13 +24,14 @@ $jam_pelajaran = jurnalmengajar_generate_jam();
 // Ambil daftar guru unik
 $daftarguru = [];
 foreach ($jadwal as $j) {
-    $daftarguru[$j['lastname']] = $j['lastname'];
+    $daftarguru[$j['userid']] = $j['lastname'];
 }
 
+// Urutkan nama guru A-Z
+asort($daftarguru);
+
 // Default filter guru
-$filterguru = $_GET['guru'] ?? $USER->lastname;
-
-
+$filterguru = $_GET['guru'] ?? $USER->id;
 // ===== Baris Filter kiri & Tombol kanan =====
 echo html_writer::start_tag('form', [
     'method' => 'get',
@@ -72,29 +74,23 @@ echo html_writer::end_tag('div');
 echo html_writer::end_tag('form');
 
 
-// Urutan hari
-$hariurut = [
-    'Senin' => 1,
-    'Selasa' => 2,
-    'Rabu' => 3,
-    'Kamis' => 4,
-    'Jumat' => 5
-];
+$hariurut = jurnalmengajar_get_urutan_hari();
 
 // GROUPING
 $grouped = [];
 
 foreach ($jadwal as $j) {
-    $key = $j['hari'] . '|' . $j['lastname'] . '|' . $j['kelas'];
+    $key = $j['hari'] . '|' . $j['userid'] . '|' . $j['kelas'];
 
     if (!isset($grouped[$key])) {
         $grouped[$key] = [
-            'hari' => $j['hari'],
-            'hari_no' => $hariurut[$j['hari']] ?? 9,
-            'lastname' => $j['lastname'],
-            'kelas' => $j['kelas'],
-            'jamke' => []
-        ];
+    'userid' => $j['userid'],
+    'hari' => $j['hari'],
+    'hari_no' => $hariurut[$j['hari']] ?? 9,
+    'lastname' => $j['lastname'],
+    'kelas' => $j['kelas'],
+    'jamke' => []
+];
     }
 
     $grouped[$key]['jamke'][] = $j['jamke'];
@@ -122,7 +118,7 @@ $totaljam = 0;
 
 foreach ($grouped as $g) {
 
-    if ($filterguru && $g['lastname'] != $filterguru) {
+    if ($filterguru && $g['userid'] != $filterguru) {
         continue;
     }
 

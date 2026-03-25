@@ -8,38 +8,6 @@ require_once(__DIR__.'/../lib.php'); // fungsi kirim WA
 
 global $DB;
 
-date_default_timezone_set('Asia/Makassar');
-function jurnalmengajar_cek_libur($tanggal) {
-    $tanggallibur = get_config('local_jurnalmengajar', 'tanggallibur');
-
-    if (empty($tanggallibur)) return false;
-
-    $lines = explode("\n", $tanggallibur);
-
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line == '') continue;
-
-        // Rentang tanggal
-        if (stripos($line, 's/d') !== false) {
-            list($start, $end) = explode('s/d', $line);
-            $start = trim($start);
-            $end   = trim($end);
-
-            if ($tanggal >= $start && $tanggal <= $end) {
-                return true;
-            }
-        } else {
-            // Satu tanggal
-            if ($tanggal == $line) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 $today = date('Y-m-d');
 $hariIndo = jurnalmengajar_get_hari_ini();
 $current = time();
@@ -103,64 +71,32 @@ foreach ($jurnaltoday as $row) {
     }
 }
 
-// ===== Baca acuan.csv =====
-$acuanfile = $CFG->dataroot . '/acuan.csv';
-
-if (!file_exists($acuanfile)) {
-    mtrace("File acuan tidak ditemukan: $acuanfile");
-    exit(1);
-}
-
-$handle = fopen($acuanfile, 'r');
-if (!$handle) {
-    mtrace("Tidak bisa membuka file acuan");
-    exit(1);
-}
-
-// Skip header
-$header = fgetcsv($handle);
+// ===== Ambil jadwal dari database =====
+$jadwal_db = $DB->get_records_sql("
+    SELECT j.userid, j.kelas, j.jamke, u.lastname
+    FROM {local_jurnalmengajar_jadwal} j
+    JOIN {user} u ON u.id = j.userid
+    WHERE j.hari = :hari
+", [
+    'hari' => $hariIndo
+]);
 
 $jadwal = [];
 
-while (($data = fgetcsv($handle)) !== false) {
-
-    // Skip baris kosong
-    if (empty($data) || count($data) < 5) continue;
-
-    $hari     = trim($data[0] ?? '');
-    $userid   = trim($data[1] ?? '');
-    $lastname = trim($data[2] ?? '');
-    $kelas    = trim($data[3] ?? '');
-    $jamkes   = trim($data[4] ?? '');
-
-    if ($hari == '' || $userid == '' || $kelas == '' || $jamkes == '') {
-        continue;
-    }
-
-    // Filter hari
-    if ($hariIndo == '' || strcasecmp($hari, $hariIndo) !== 0) {
-        continue;
-    }
-
-    foreach (explode(',', $jamkes) as $jamke) {
-        $jamke = (int)trim($jamke);
-        if ($jamke <= 0) continue;
-
-        $jadwal[] = [
-            'userid'   => (int)$userid,
-            'lastname' => $lastname,
-            'kelas'    => $kelas,
-            'jamke'    => $jamke
-        ];
-    }
+foreach ($jadwal_db as $j) {
+    $jadwal[] = [
+        'userid'   => $j->userid,
+        'lastname' => $j->lastname,
+        'kelas'    => $j->kelas,
+        'jamke'    => $j->jamke
+    ];
 }
-
-fclose($handle);
 
 if (empty($jadwal)) {
-    mtrace("Tidak ada jadwal di acuan untuk hari $hariIndo");
+    mtrace("Tidak ada jadwal di database untuk hari $hariIndo");
     exit(0);
 }
+
 // ===== Group jurnal yang belum diisi =====
 $pending = [];
 

@@ -1,0 +1,192 @@
+<?php
+require('../../config.php');
+require_once(__DIR__.'/lib.php');
+
+require_login();
+$context = context_system::instance();
+require_capability('moodle/site:config', $context);
+
+$PAGE->set_context($context);
+$PAGE->set_url('/local/jurnalmengajar/jadwal_manage.php');
+$PAGE->set_pagelayout('standard');
+$PAGE->set_title('Manajemen Jadwal Mengajar');
+$PAGE->set_heading('Manajemen Jadwal Mengajar');
+
+echo $OUTPUT->header();
+
+global $DB, $USER;
+
+// ============================
+// Hapus jadwal (per grup)
+// ============================
+$userid = optional_param('userid', 0, PARAM_INT);
+$hari   = optional_param('hari', '', PARAM_TEXT);
+$kelas  = optional_param('kelas', '', PARAM_TEXT);
+
+if ($userid && $hari && $kelas) {
+    $DB->delete_records('local_jurnalmengajar_jadwal', [
+        'userid' => $userid,
+        'hari' => $hari,
+        'kelas' => $kelas
+    ]);
+    echo $OUTPUT->notification('Jadwal berhasil dihapus', 'notifysuccess');
+}
+
+// ============================
+// Ambil daftar guru untuk filter
+// ============================
+$sqlguru = "SELECT DISTINCT u.id, u.lastname
+            FROM {local_jurnalmengajar_jadwal} j
+            JOIN {user} u ON u.id = j.userid
+            ORDER BY u.lastname";
+
+$dataguru = $DB->get_records_sql($sqlguru);
+
+$listguru = [];
+foreach ($dataguru as $g) {
+    $listguru[$g->id] = $g->lastname;
+}
+
+// Default guru = user login
+$filterguru = optional_param('guru', $USER->id, PARAM_INT);
+
+// ============================
+// Ambil jadwal
+// ============================
+$sql = "SELECT j.id, j.userid, j.hari, j.kelas, j.jamke, u.lastname
+        FROM {local_jurnalmengajar_jadwal} j
+        JOIN {user} u ON u.id = j.userid
+        WHERE j.userid = :userid
+        ORDER BY u.lastname, j.hari, j.jamke";
+
+$jadwal = $DB->get_records_sql($sql, ['userid' => $filterguru]);
+
+// ============================
+// Urutan hari dari lib.php
+// ============================
+$hariurut = jurnalmengajar_get_urutan_hari();
+
+// ============================
+// Grouping jadwal
+// ============================
+$grouped = [];
+
+foreach ($jadwal as $j) {
+    $key = $j->hari . '|' . $j->userid . '|' . $j->kelas;
+
+    if (!isset($grouped[$key])) {
+        $grouped[$key] = [
+            'userid' => $j->userid,
+            'hari' => $j->hari,
+            'hari_no' => $hariurut[$j->hari] ?? 99,
+            'lastname' => $j->lastname,
+            'kelas' => $j->kelas,
+            'jamke' => []
+        ];
+    }
+
+    $grouped[$key]['jamke'][] = $j->jamke;
+}
+
+// Urutkan berdasarkan hari
+usort($grouped, function($a, $b) {
+    return $a['hari_no'] <=> $b['hari_no'];
+});
+
+// ============================
+// Tombol atas
+// ============================
+echo html_writer::link(
+    new moodle_url('/local/jurnalmengajar/import_acuan.php'),
+    'Import CSV',
+    ['class' => 'btn btn-secondary']
+);
+
+echo " ";
+
+echo html_writer::link(
+    new moodle_url('/local/jurnalmengajar/jadwal_view.php'),
+    'Lihat Jadwal',
+    ['class' => 'btn btn-primary']
+);
+
+echo "<br><br>";
+
+// ============================
+// Filter guru
+// ============================
+echo html_writer::start_tag('form', [
+    'method' => 'get',
+    'style' => 'margin-bottom:15px;'
+]);
+
+echo "Filter Guru: ";
+echo html_writer::select($listguru, 'guru', $filterguru);
+
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => 'Tampilkan',
+    'class' => 'btn btn-secondary',
+    'style' => 'margin-left:5px'
+]);
+
+echo html_writer::end_tag('form');
+
+// ============================
+// Tabel jadwal
+// ============================
+echo "<table class='generaltable'>";
+echo "<tr>
+        <th>No</th>
+        <th>Hari</th>
+        <th>Guru</th>
+        <th>Kelas</th>
+        <th>Jam</th>
+        <th>Edit</th>
+        <th>Hapus</th>
+      </tr>";
+
+$no = 1;
+$hari_sebelumnya = '';
+
+foreach ($grouped as $g) {
+
+    sort($g['jamke']);
+    $jamgabung = implode(',', $g['jamke']);
+
+    $hapusurl = new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
+        'userid' => $g['userid'],
+        'hari' => $g['hari'],
+        'kelas' => $g['kelas']
+    ]);
+
+    $editurl = new moodle_url('/local/jurnalmengajar/jadwal_edit.php', [
+        'userid' => $g['userid'],
+        'hari' => $g['hari'],
+        'kelas' => $g['kelas']
+    ]);
+
+    echo "<tr>";
+
+    if ($hari_sebelumnya != $g['hari']) {
+        echo "<td>$no</td>";
+        echo "<td>{$g['hari']}</td>";
+        $hari_sebelumnya = $g['hari'];
+        $no++;
+    } else {
+        echo "<td></td>";
+        echo "<td></td>";
+    }
+
+    echo "<td>{$g['lastname']}</td>";
+    echo "<td>{$g['kelas']}</td>";
+    echo "<td>$jamgabung</td>";
+    echo "<td><a class='btn btn-warning' href='$editurl'>Edit</a></td>";
+    echo "<td><a class='btn btn-danger' href='$hapusurl' onclick=\"return confirm('Hapus jadwal?')\">Hapus</a></td>";
+
+    echo "</tr>";
+}
+
+echo "</table>";
+
+echo $OUTPUT->footer();
