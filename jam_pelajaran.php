@@ -11,7 +11,7 @@ $PAGE->set_context($context);
 $PAGE->set_url('/local/jurnalmengajar/jam_pelajaran.php');
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title('Jam Pelajaran');
-$PAGE->set_heading('Jam Pelajaran');
+$PAGE->set_heading('Jam Pelajaran (JP)');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
@@ -35,15 +35,15 @@ echo $OUTPUT->header();
 echo "<form method='post'>";
 echo "<table class='generaltable'>";
 
-echo "<tr><td>Jumlah Jam</td><td><input type='number' name='jumlah_jam' value='".($config['jumlah_jam'] ?? '')."'></td></tr>";
-echo "<tr><td>Durasi 1 Jam (menit)</td><td><input type='number' name='durasi_jam' value='".($config['durasi_jam'] ?? '')."'></td></tr>";
-echo "<tr><td>Jam Mulai</td><td><input type='time' name='jam_mulai' value='".($config['jam_mulai'] ?? '')."'></td></tr>";
+echo "<tr><td>Jumlah JP </td><td><input type='number' name='jumlah_jam' value='".($config['jumlah_jam'] ?? '')."'></td></tr>";
+echo "<tr><td>Durasi 1 JP dalam menit</td><td><input type='number' name='durasi_jam' value='".($config['durasi_jam'] ?? '')."'></td></tr>";
+echo "<tr><td>JP pertama mulai pukul</td><td><input type='time' name='jam_mulai' value='".($config['jam_mulai'] ?? '')."'></td></tr>";
 
-echo "<tr><td>Istirahat 1 setelah jam ke</td><td><input type='number' name='ist1_setelah' value='".($config['ist1_setelah'] ?? '')."'></td></tr>";
-echo "<tr><td>Durasi Istirahat 1 (menit)</td><td><input type='number' name='ist1_durasi' value='".($config['ist1_durasi'] ?? '')."'></td></tr>";
+echo "<tr><td>Istirahat pertama setelah JP ke</td><td><input type='number' name='ist1_setelah' value='".($config['ist1_setelah'] ?? '')."'></td></tr>";
+echo "<tr><td>Durasi istirahat pertama dalam menit</td><td><input type='number' name='ist1_durasi' value='".($config['ist1_durasi'] ?? '')."'></td></tr>";
 
-echo "<tr><td>Istirahat 2 setelah jam ke</td><td><input type='number' name='ist2_setelah' value='".($config['ist2_setelah'] ?? '')."'></td></tr>";
-echo "<tr><td>Durasi Istirahat 2 (menit)</td><td><input type='number' name='ist2_durasi' value='".($config['ist2_durasi'] ?? '')."'></td></tr>";
+echo "<tr><td>Istirahat kedua setelah JP ke</td><td><input type='number' name='ist2_setelah' value='".($config['ist2_setelah'] ?? '')."'></td></tr>";
+echo "<tr><td>Durasi istirahat kedua dalam menit</td><td><input type='number' name='ist2_durasi' value='".($config['ist2_durasi'] ?? '')."'></td></tr>";
 
 echo "</table>";
 echo "<br><input type='submit' value='Simpan & Generate' class='btn btn-primary'>";

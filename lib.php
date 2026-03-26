@@ -36,6 +36,11 @@ if ($mode == 'tanggal') {
            ' Pukul ' . date('H:i',$timestamp) . ' WITA';
 }
 
+// nama murid
+function format_nama_siswa($nama) {
+    return ucwords(strtolower(trim($nama)));
+}
+
 /**
  * Ambil nama kelas dari ID cohort
  */
@@ -287,7 +292,9 @@ foreach ($tujuan as $nomor) {
 
     $ch = curl_init();
     curl_setopt_array($ch, [
-        CURLOPT_URL => $wablas_url,
+    CURLOPT_URL => $wablas_url,
+    CURLOPT_TIMEOUT => 20,
+    CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_HTTPHEADER => [
             "Authorization: $token",
             "Content-Type: application/json"
@@ -300,11 +307,80 @@ foreach ($tujuan as $nomor) {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    file_put_contents($logfile,
+        file_put_contents($logfile,
         date('Y-m-d H:i:s') . " | Response: $response\n",
         FILE_APPEND
     );
 }
-// PENUTUP FUNGSI (INI YANG SERING KURANG)
+
 return true;
+} // <-- PENUTUP fungsi jurnalmengajar_kirim_wa()
+
+
+// ===============================
+// Fungsi ambil beban mengajar guru
+// ===============================
+function jurnalmengajar_get_beban_jam_guru() {
+    require_once(__DIR__.'/jadwal_acuan_lib.php');
+
+    $jadwal = jurnalmengajar_get_jadwal_acuan();
+    $beban = [];
+
+    foreach ($jadwal as $j) {
+        $userid = $j['userid'];
+
+        if (!isset($beban[$userid])) {
+            $beban[$userid] = 0;
+        }
+
+        $beban[$userid]++;
+    }
+
+    return $beban;
+}//
+// ===============================
+// Ambil semua kelas (cohort)
+// ===============================
+function jurnalmengajar_get_all_kelas() {
+    global $DB;
+
+    $sql = "SELECT name FROM {cohort} ORDER BY name ASC";
+    $records = $DB->get_records_sql($sql);
+
+    $kelas = [];
+    foreach ($records as $r) {
+        $kelas[$r->name] = $r->name;
+    }
+
+    return $kelas;
+}
+
+// ===============================
+// Ambil siswa dari kelas (cohort)
+// ===============================
+function jurnalmengajar_get_siswa_by_kelas($kelas) {
+    global $DB;
+
+    return $DB->get_records_sql("
+        SELECT u.id, u.firstname, u.lastname
+        FROM {user} u
+        JOIN {cohort_members} cm ON cm.userid = u.id
+        JOIN {cohort} c ON c.id = cm.cohortid
+        WHERE c.name = ?
+        ORDER BY u.lastname
+    ", [$kelas]);
+}
+
+// ===============================
+// Ambil NIS user dari profile field
+// ===============================
+function jurnalmengajar_get_nis_user($userid) {
+    global $DB;
+
+    return $DB->get_field_sql("
+        SELECT d.data
+        FROM {user_info_data} d
+        JOIN {user_info_field} f ON f.id = d.fieldid
+        WHERE f.shortname = 'nis' AND d.userid = ?
+    ", [$userid]);
 }

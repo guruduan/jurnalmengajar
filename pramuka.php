@@ -11,7 +11,7 @@ $PAGE->set_url(new moodle_url('/local/jurnalmengajar/pramuka.php'));
 $PAGE->set_title('Jurnal Kegiatan Pramuka');
 $PAGE->set_heading('Jurnal Kegiatan Pramuka');
 
-global $DB, $USER;
+global $DB, $USER, $OUTPUT;
 
 $kelaslist = $DB->get_records_menu('cohort', null, 'name ASC', 'id, name');
 
@@ -84,36 +84,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $DB->insert_record('local_jurnalpramuka', $record);
 
     // ================= WA =================
-    $kelasnama = get_nama_kelas($kelasid);
-    $nomorwa   = get_nomor_wali_kelas($kelasid); // ✅ FIX
+$kelasnama = get_nama_kelas($kelasid);
+$nomorwa   = get_nomor_wali_kelas($kelasid);
 
-    if ($nomorwa) {
+if ($nomorwa) {
 
-        $waktu = tanggal_indo($record->timecreated);
+    $waktu = tanggal_indo($record->timecreated);
 
-        $absen_data = json_decode($record->absen, true);
-        $daftarabsen = '-';
+    $absen_data = json_decode($record->absen, true);
+    $daftarabsen = '-';
 
-        if (!empty($absen_data)) {
-            $list = [];
-            foreach ($absen_data as $nama => $alasan) {
-                $list[] = "$nama ($alasan)";
-            }
-            $daftarabsen = implode(", ", $list);
+    if (!empty($absen_data)) {
+        $list = [];
+        foreach ($absen_data as $nama => $alasan) {
+            $nama = format_nama_siswa($nama);
+            $list[] = "$nama ($alasan)";
         }
-
-        $pesan = "*🏕 Kegiatan Pramuka*\n\n"
-               . "📅 Waktu: $waktu\n"
-               . "🏫 Kelas: $kelasnama\n"
-               . "👤 Guru: {$USER->lastname}\n"
-               . "📖 Materi: {$record->materi}\n"
-               . "📌 Catatan: {$record->catatan}\n"
-               . "🙍‍♂️ Tidak hadir: $daftarabsen\n\n"
-               . "_Dikirim kepada Wali kelas sebagai laporan_";
-
-$tujuan = [$nomorwa];
-jurnalmengajar_kirim_wa($tujuan, $pesan);
+        $daftarabsen = implode(", ", $list);
     }
+
+    $namaguru = format_nama_siswa($USER->lastname);
+
+    $pesan = "*🏕 Kegiatan Pramuka*\n\n"
+           . "📅 Waktu: $waktu\n"
+           . "🏫 Kelas: $kelasnama\n"
+           . "👤 Guru: $namaguru\n"
+           . "📖 Materi: {$record->materi}\n"
+           . "📌 Catatan: {$record->catatan}\n"
+           . "🙍‍♂️ Tidak hadir: $daftarabsen\n\n"
+           . "_Dikirim kepada Wali kelas sebagai laporan_";
+
+    $tujuan = [$nomorwa];
+    jurnalmengajar_kirim_wa($tujuan, $pesan);
+}
 
     redirect(new moodle_url('/local/jurnalmengajar/pramuka.php'), 'Jurnal pramuka berhasil disimpan');
 }
@@ -129,7 +132,7 @@ echo $OUTPUT->heading('Input Jurnal Pramuka');
     <label>Kelas:</label><br>
     <select name="kelas">
         <?php foreach ($kelaslist as $id => $name): ?>
-            <option value="<?= $id ?>"><?= $name ?></option>
+            <option value="<?= $id ?>"><?= format_string($name) ?></option>
         <?php endforeach; ?>
     </select><br><br>
 
@@ -148,8 +151,18 @@ echo $OUTPUT->heading('Input Jurnal Pramuka');
 <hr>
 
 <?php
+$page = optional_param('page', 0, PARAM_INT);
+$perpage = 20;
+$offset = $page * $perpage;
+
+$total = $DB->count_records('local_jurnalpramuka');
 // ================= RIWAYAT =================
-$riwayat = $DB->get_records('local_jurnalpramuka', null, 'timecreated DESC', '*', 0, 20);
+$riwayat = $DB->get_records_sql("
+    SELECT *
+    FROM {local_jurnalpramuka}
+    ORDER BY timecreated DESC
+    LIMIT $perpage OFFSET $offset
+");
 
 if ($riwayat) {
 
@@ -158,40 +171,47 @@ if ($riwayat) {
     $table = new html_table();
     $table->head = ['No','Waktu','Guru','Kelas','Materi','Catatan','Tidak hadir'];
 
-    $no = 1;
+$no = $offset + 1;
 
     foreach ($riwayat as $r) {
 
-        $guru = $DB->get_field('user', 'lastname', ['id' => $r->userid]) ?? '-';
-if (is_numeric($r->kelas)) {
-    $kelas = get_nama_kelas($r->kelas);
-} else {
-    $kelas = $r->kelas ?: '-'; // data lama (string)
-}
+    $guru = $DB->get_field('user', 'lastname', ['id' => $r->userid]) ?? '-';
+    $guru = format_nama_siswa($guru);
 
-        $absen_data = json_decode($r->absen, true);
-        $daftarabsen = '-';
-
-        if (!empty($absen_data)) {
-            $list = [];
-            foreach ($absen_data as $nama => $alasan) {
-                $list[] = "$nama ($alasan)";
-            }
-            $daftarabsen = implode(", ", $list);
-        }
-
-        $table->data[] = [
-            $no++,
-            tanggal_indo($r->timecreated), // ✅ FIX
-            $guru,
-            $kelas,
-            format_string($r->materi),
-            format_string($r->catatan),
-            $daftarabsen
-        ];
+    if (is_numeric($r->kelas)) {
+        $kelas = get_nama_kelas($r->kelas);
+    } else {
+        $kelas = $r->kelas ?: '-';
     }
+
+    $absen_data = json_decode($r->absen, true);
+    $daftarabsen = '-';
+
+    if (!empty($absen_data)) {
+        $list = [];
+        foreach ($absen_data as $nama => $alasan) {
+            $nama = format_nama_siswa($nama);
+            $list[] = "$nama ($alasan)";
+        }
+        $daftarabsen = implode(", ", $list);
+    }
+
+    $table->data[] = [
+        $no++,
+        tanggal_indo($r->timecreated),
+        $guru,
+        $kelas,
+        format_string($r->materi),
+        format_string($r->catatan),
+        $daftarabsen
+    ];
+}
 
     echo html_writer::table($table);
 }
 
+$baseurl = new moodle_url('/local/jurnalmengajar/pramuka.php', [
+    'page' => $page
+]);
+echo $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);
 echo $OUTPUT->footer();

@@ -229,7 +229,7 @@ if (empty($muridids)) {
 
         $pesan = "*📋 Jurnal Guru Wali*\n\n"
                . "📅 Waktu: ".tanggal_indo($now)."\n"
-               . "👤 Murid: ".ucwords(strtolower($murid->lastname))."\n"
+               . "👤 Murid: ".format_nama_siswa($murid->lastname)."\n"
                . "🏫 Kelas: ".$kelas."\n"
                . "🧩 Topik: ".$data->topik."\n"
                . "💡 Tindak lanjut: ".$data->tindaklanjut."\n"
@@ -279,7 +279,7 @@ $aksi = html_writer::link($editurl, '✏️ Edit');
     $table->data[] = [
         $no++,
         tanggal_indo($r->timecreated),
-        s($r->lastname),
+    s(format_nama_siswa($r->lastname)),
         s($kelas),
 	s($r->topik),
         s($r->tindaklanjut),

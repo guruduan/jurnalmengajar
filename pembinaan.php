@@ -76,9 +76,12 @@ if ($mform->is_cancelled()) {
         $waktu = tanggal_indo($record->timecreated);
 
         $peserta = json_decode($record->peserta, true);
-        $peserta_str = is_array($peserta) && !empty($peserta)
-            ? implode(', ', $peserta)
-            : '-';
+if (is_array($peserta) && !empty($peserta)) {
+    $peserta = array_map('format_nama_siswa', $peserta);
+    $peserta_str = implode(', ', $peserta);
+} else {
+    $peserta_str = '-';
+}
 
         $pesan = "*📋 Laporan Pembinaan Siswa*\n\n"
                . "📅 Waktu: $waktu\n"
@@ -134,26 +137,44 @@ echo html_writer::empty_tag('input', [
 
 echo html_writer::end_tag('form');
 
+// ================= PAGING =================
+$page = optional_param('page', 0, PARAM_INT);
+$perpage = 20;
+$offset = $page * $perpage;
+
+// ================= TOTAL DATA =================
+$total = $DB->count_records('local_jurnalpembinaan');
+
 // ================= TABEL =================
-$records = $DB->get_records('local_jurnalpembinaan', null, 'timecreated DESC');
+$records = $DB->get_records_sql("
+    SELECT *
+    FROM {local_jurnalpembinaan}
+    ORDER BY timecreated DESC
+    LIMIT $perpage OFFSET $offset
+");
 
 if ($records) {
 
     $table = new html_table();
     $table->head = ['No','Waktu','Nama Murid','Kelas','Permasalahan','Upaya','Guru BK'];
 
-    $no = 1;
+    $no = $offset + 1;
 
     foreach ($records as $r) {
 
         $namakelas = get_nama_kelas($r->kelas);
 
         $peserta = json_decode($r->peserta ?? '[]', true);
-        $peserta_str = is_array($peserta) ? implode(', ', $peserta) : '-';
+
+        if (is_array($peserta) && !empty($peserta)) {
+            $peserta = array_map('format_nama_siswa', $peserta);
+            $peserta_str = implode(', ', $peserta);
+        } else {
+            $peserta_str = '-';
+        }
 
         $gurubk = $DB->get_field('user', 'lastname', ['id' => $r->userid]) ?? '-';
 
-        // ✅ pakai fungsi global
         $waktu = tanggal_indo($r->timecreated);
 
         $table->data[] = [
@@ -172,5 +193,9 @@ if ($records) {
 } else {
     echo $OUTPUT->notification('Belum ada data Laporan Pembinaan.', 'notifymessage');
 }
+
+// ================= PAGING BAR =================
+$baseurl = new moodle_url('/local/jurnalmengajar/pembinaan.php');
+echo $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);
 
 echo $OUTPUT->footer();

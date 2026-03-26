@@ -1,6 +1,8 @@
 <?php
 require_once('../../config.php');
+require_once(__DIR__.'/lib.php');
 require_login();
+
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:submit', $context);
 
@@ -11,60 +13,85 @@ $PAGE->set_heading('Rekap Surat Izin Keluar/Masuk Murid');
 
 global $DB, $OUTPUT;
 
+// ================= PARAMETER =================
 $kelasfilter = optional_param('kelas', 0, PARAM_INT);
 $siswafilter = optional_param('siswaid', 0, PARAM_INT);
 $dari = optional_param('dari', '', PARAM_RAW);
 $sampai = optional_param('sampai', '', PARAM_RAW);
+$page = optional_param('page', 0, PARAM_INT);
 
-$starttime = $dari ? strtotime(str_replace('-', '/', $dari)) : 0;
-$endtime = $sampai ? strtotime(str_replace('-', '/', $sampai)) + 86399 : time();
+$perpage = 20;
+$offset  = $page * $perpage;
 
-// Ambil daftar cohort
+$starttime = $dari ? strtotime($dari) : 0;
+$endtime   = $sampai ? strtotime($sampai) + 86399 : time();
+
+// ================= FILTER DROPDOWN =================
 $cohorts = $DB->get_records_menu('cohort', null, 'name ASC', 'id, name');
 
-// Ambil siswa jika kelas terpilih
 $siswaoptions = [];
 if ($kelasfilter) {
     $members = $DB->get_records('cohort_members', ['cohortid' => $kelasfilter]);
     foreach ($members as $m) {
         $user = $DB->get_record('user', ['id' => $m->userid], 'id, lastname');
         if ($user) {
-            $siswaoptions[$user->id] = $user->lastname;
+            $siswaoptions[$user->id] = format_nama_siswa($user->lastname);
         }
     }
 }
 
+// ================= PARAMS SQL =================
 $params = ['start' => $starttime, 'end' => $endtime];
+
+// ================= HITUNG TOTAL =================
+$countsql = "SELECT COUNT(1)
+               FROM {local_jurnalmengajar_suratizin} si
+               WHERE si.timecreated BETWEEN :start AND :end";
+
+if ($kelasfilter) {
+    $countsql .= " AND si.kelasid = :kelas";
+    $params['kelas'] = $kelasfilter;
+}
+
+if ($siswafilter) {
+    $countsql .= " AND si.userid = :siswa";
+    $params['siswa'] = $siswafilter;
+}
+
+$total = $DB->count_records_sql($countsql, $params);
+
+// ================= QUERY DATA =================
 $sql = "SELECT si.*, 
                u.lastname AS siswa, 
                gp.lastname AS gurupengajar, 
-               ci.name AS kelas,
-               pi.lastname AS penginput
+               pi.lastname AS penginput,
+               si.kelasid
           FROM {local_jurnalmengajar_suratizin} si
           JOIN {user} u ON u.id = si.userid
           JOIN {user} gp ON gp.id = si.guru_pengajar
           JOIN {user} pi ON pi.id = si.penginput
-          JOIN {cohort} ci ON ci.id = si.kelasid
          WHERE si.timecreated BETWEEN :start AND :end";
 
-// Tambahkan filter kelas
 if ($kelasfilter) {
     $sql .= " AND si.kelasid = :kelas";
-    $params['kelas'] = $kelasfilter;
 }
 
-// Tambahkan filter siswa
 if ($siswafilter) {
     $sql .= " AND si.userid = :siswa";
-    $params['siswa'] = $siswafilter;
 }
+
+$sql .= " ORDER BY si.timecreated DESC
+          LIMIT $perpage OFFSET $offset";
 
 $results = $DB->get_records_sql($sql, $params);
 
-// Tampilkan filter
+// =====================
+// TAMPILKAN HALAMAN
+// =====================
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Rekap Surat Izin Murid');
 
+// ================= FILTER FORM =================
 echo html_writer::start_tag('form', ['method' => 'get']);
 
 echo html_writer::start_div();
@@ -90,77 +117,48 @@ echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => 'Tampilkan'
 echo html_writer::end_div();
 
 echo html_writer::end_tag('form');
-//
-function format_tanggal_wita($timestamp) {
-    $hari = [
-        'Sunday' => 'Minggu',
-        'Monday' => 'Senin',
-        'Tuesday' => 'Selasa',
-        'Wednesday' => 'Rabu',
-        'Thursday' => 'Kamis',
-        'Friday' => 'Jumat',
-        'Saturday' => 'Sabtu'
-    ];
 
-    $bulan = [
-        '01' => 'Januari',
-        '02' => 'Februari',
-        '03' => 'Maret',
-        '04' => 'April',
-        '05' => 'Mei',
-        '06' => 'Juni',
-        '07' => 'Juli',
-        '08' => 'Agustus',
-        '09' => 'September',
-        '10' => 'Oktober',
-        '11' => 'November',
-        '12' => 'Desember'
-    ];
-
-    $dayname = $hari[date('l', $timestamp)] ?? date('l', $timestamp);
-    $day = date('d', $timestamp);
-    $month = $bulan[date('m', $timestamp)] ?? date('m', $timestamp);
-    $year = date('Y', $timestamp);
-    $time = date('H:i', $timestamp);
-
-    return "$dayname, $day $month $year Pukul $time WITA";
-}
-
-//
-// Tampilkan tabel rekap
+// =====================
+// TABEL
+// =====================
 if ($results) {
     $table = new html_table();
     $table->head = ['No', 'Tanggal', 'Nama Murid', 'Kelas', 'Guru Pengajar', 'Alasan', 'Keperluan', 'Pengawas'];
     $table->data = [];
-    
-    
-    $no = 1;
-    foreach ($results as $row) {
-//        $tanggal = userdate($row->timecreated, '%d-%m-%Y', 99, 'Asia/Makassar');
-//        $tanggal = userdate($row->timecreated, '%A, %d-%m-%Y %H:%M', 99, 'Asia/Makassar');
-//$tanggal = terjemah_hari($row->timecreated) . ', ' . userdate($row->timecreated, '%d-%m-%Y %H:%M', 99, 'Asia/Makassar');
-$tanggal = format_tanggal_wita($row->timecreated);
 
-        $namasiswa = ucwords(strtolower($row->siswa));
-        $namaguru = $row->gurupengajar;
-        $pengawas = $row->penginput;
-//        $namaguru = ucwords(strtolower($row->gurupengajar));
-//        $pengawas = ucwords(strtolower($row->penginput));
+    $no = $offset + 1;
+
+    foreach ($results as $row) {
+        $tanggal = tanggal_indo($row->timecreated);
+        $kelas   = get_nama_kelas($row->kelasid);
 
         $table->data[] = [
             $no++,
             $tanggal,
-            $namasiswa,
-            $row->kelas,
-            $namaguru,
+            format_nama_siswa($row->siswa),
+            $kelas,
+            $row->gurupengajar,
             $row->alasan,
             $row->keperluan,
-            $pengawas
+            $row->penginput
         ];
     }
+
     echo html_writer::table($table);
 } else {
     echo $OUTPUT->notification('Tidak ada data surat izin pada filter ini.', 'notifymessage');
 }
+
+// =====================
+// PAGING
+// =====================
+$baseurl = new moodle_url('/local/jurnalmengajar/rekap_surat_izin.php', [
+    'kelas' => $kelasfilter,
+    'siswaid' => $siswafilter,
+    'dari' => $dari,
+    'sampai' => $sampai
+]);
+
+echo $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);
 
 echo $OUTPUT->footer();

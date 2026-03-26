@@ -3,12 +3,13 @@ require_once('../../config.php');
 require_once(__DIR__.'/lib.php');
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
+$context = context_system::instance();
+require_capability('moodle/site:config', $context);
 
 header('Content-Type: text/csv');
-header('Content-Disposition: attachment;filename="format_acuan.csv"');
+header('Content-Disposition: attachment; filename="format_binaan.csv"');
 
-echo "hari,userid,lastname,kelas,jamke\n";
+echo "userid,lastname,nis,murid,kelas\n";
 
 global $DB;
 
@@ -27,14 +28,10 @@ $sql = "SELECT u.id, u.lastname
 
 $users = $DB->get_records_sql($sql, ['roleid' => $role->id]);
 
-// Ambil hari sekolah dari setting plugin
-$hari_list = jurnalmengajar_get_hari_sekolah();
-
-// Loop
+// Tampilkan satu baris kosong per guru (untuk template)
 foreach ($users as $u) {
-    foreach ($hari_list as $hari) {
-        echo $hari . ',' .
-             $u->id . ',"' .
-             $u->lastname . '",,' . "\n";
-    }
+    echo $u->id . ',' .
+         '"' . $u->lastname . '",,,,' . "\n";
 }
+
+exit;

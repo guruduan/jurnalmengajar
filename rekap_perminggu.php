@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__.'/lib.php');
 require_login();
 
 $context = context_system::instance();
@@ -8,7 +9,7 @@ require_capability('local/jurnalmengajar:submit', $context);
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/jurnalmengajar/rekap_perminggu.php'));
 $PAGE->set_title('Rekap Mingguan Guru');
-$PAGE->set_heading('Rekap Mingguan Guru');
+$PAGE->set_heading('Rekap Mengajar Mingguan Guru');
 
 // Tambahkan CSS untuk sticky header
 //$PAGE->requires->css('/local/jurnalmengajar/css/stickyheader.css');
@@ -50,9 +51,8 @@ $entries = $DB->get_records_select(
     [$tanggal_awal_minggu_ini, $tanggal_akhir_minggu_ini]
 );
 
-// Ambil beban guru dari file JSON
-$configfile = $CFG->dataroot . '/jam_guru.json';
-$beban = file_exists($configfile) ? json_decode(file_get_contents($configfile), true) : [];
+// Ambil beban guru bukan dari file JSON
+$beban = jurnalmengajar_get_beban_jam_guru();
 
 // Siapkan user
 $all_userids = array_unique(array_map(fn($e) => $e->userid, $entries));
@@ -156,8 +156,14 @@ echo html_writer::start_tag('tbody');
 $no = 1;
 foreach ($rekap as $userid => $jumlahjam) {
     $user = $user_cache[$userid];
-    $beban_minggu = $beban[$userid] ?? 24;
-    $persen = round(($jumlahjam / $beban_minggu) * 100);
+
+    $beban_minggu = $beban[$userid] ?? 0;
+
+    if ($beban_minggu > 0) {
+        $persen = round(($jumlahjam / $beban_minggu) * 100);
+    } else {
+        $persen = 0;
+    }
 
     echo html_writer::start_tag('tr');
     echo html_writer::tag('td', $no++);
