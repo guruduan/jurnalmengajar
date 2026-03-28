@@ -14,17 +14,18 @@ Plugin ini menyediakan beberapa fitur administrasi sekolah:
 * Jam pelajaran
 * Siswa tidak hadir
 * Keterangan
+* Ekspor ke xlsx
 
-### 2. Jurnal Wali Kelas
+### 2. Jurnal Guru Wali
 
-* Catatan wali kelas
-* Monitoring siswa
-* Catatan pelanggaran / pembinaan
+* Jurnal Guru wali
+* expor ke xlsx
 
 ### 3. Surat Izin Siswa
 
 * Surat izin keluar
 * Surat izin masuk
+* Surat izin pulang
 * Cetak PDF
 * Rekap surat izin
 
@@ -38,17 +39,20 @@ Plugin ini menyediakan beberapa fitur administrasi sekolah:
 
 * Jumlah jam mengajar
 * Jam terlaksana
-* Persentase kehadiran mengajar
+* Persentase KBM tiap pekan
+* 
 
 ### 6. Layanan BK / Pembinaan Siswa
 
-* Catatan pembinaan siswa
+* Jurnal layanan BK
+* Jurnal pembinaan murid
+* Riwayat layanan bK
 * Riwayat pembinaan
 
 ### 7. Notifikasi WhatsApp
 
 * Notifikasi otomatis saat jurnal diinput
-* Dikirim ke wali kelas / kepala sekolah
+* Dikirim ke wali kelas
 * Menggunakan API WhatsApp (Wablas / sejenis)
 
 ---
