@@ -1,6 +1,6 @@
 # Jurnal Mengajar - Moodle Local Plugin
 
-Plugin Moodle untuk administrasi sekolah yang digunakan untuk mencatat aktivitas guru dan administrasi siswa seperti jurnal mengajar, jurnal wali kelas, surat izin siswa, rekap kehadiran, layanan BK, dan notifikasi WhatsApp.
+Plugin Moodle untuk administrasi sekolah yang digunakan untuk mencatat aktivitas guru dan administrasi siswa seperti jurnal mengajar, jurnal guru wali, surat izin murid, rekap kehadiran, layanan BK, kegiatan pramuka dan notifikasi WhatsApp.
 
 ## Fitur Utama
 
