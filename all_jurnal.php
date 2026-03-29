@@ -157,7 +157,7 @@ if ($entries) {
             $absentext = $e->absen;
         }
 
-        $editurl = new moodle_url('/local/jurnalmengajar/editadmin.php', ['id' => $e->id]);
+        $editurl = new moodle_url('/local/jurnalmengajar/edit_jurnal.php', ['id' => $e->id]);
         $deleteurl = new moodle_url('/local/jurnalmengajar/delete.php', [
             'id' => $e->id,
             'sesskey' => sesskey()

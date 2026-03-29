@@ -6,10 +6,12 @@ if ($hassiteconfig) {
     // =========================
     // KATEGORI PLUGIN
     // =========================
+    if (!$ADMIN->locate('local_jurnalmengajar_cat')) {
     $ADMIN->add('localplugins', new admin_category(
         'local_jurnalmengajar_cat',
         'Jurnal Mengajar'
     ));
+}
 
     // =========================
     // HALAMAN SETTING UTAMA
@@ -183,4 +185,23 @@ Contoh:
         new moodle_url('/local/jurnalmengajar/wali_kelas.php'),
         'moodle/site:config'
     ));
+    
+    //
+    // PEMBINA EKSTRA
+    //
+    $ADMIN->add('local_jurnalmengajar_cat', new admin_externalpage(
+    'local_jurnalmengajar_pembina_ekstra',
+    'Mapping Pembina Ekstrakurikuler',
+    new moodle_url('/local/jurnalmengajar/pembina_ekstra.php'),
+    'moodle/site:config'
+));
+//
+// PESERTA EKTRA
+//
+$ADMIN->add('local_jurnalmengajar_cat', new admin_externalpage(
+    'local_jurnalmengajar_peserta_ekstra',
+    'Peserta Ekstrakurikuler',
+    new moodle_url('/local/jurnalmengajar/peserta_ekstra.php'),
+    'moodle/site:config'
+));
 }

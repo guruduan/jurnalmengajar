@@ -4,7 +4,7 @@ require_once($CFG->dirroot . '/local/jurnalmengajar/lib.php');
 require_login();
 
 $context = context_system::instance();
-require_capability('local/jurnalmengajar:view', $context);
+require_capability('moodle/site:config', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/jurnalmengajar/riwayat_pramuka.php'));

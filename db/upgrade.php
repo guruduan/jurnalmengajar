@@ -74,5 +74,99 @@ function xmldb_local_jurnalmengajar_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026032701, 'local', 'jurnalmengajar');
     }
 
+    // =====================================================
+// 2026033001 - Tabel Jurnal Ekstrakurikuler
+// =====================================================
+if ($oldversion < 2026033001) {
+
+    // Tabel Ekstrakurikuler
+    $table = new xmldb_table('local_jm_ekstra');
+
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('namaekstra', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $dbman->create_table($table);
+    }
+
+    // Mapping Pembina
+    $table = new xmldb_table('local_jm_ekstra_pembina');
+
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('ekstraid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('ekstraid_idx', XMLDB_INDEX_NOTUNIQUE, ['ekstraid']);
+        $table->add_index('userid_idx', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+
+        $dbman->create_table($table);
+    }
+
+    // Peserta Ekstra
+    $table = new xmldb_table('local_jm_ekstra_peserta');
+
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('ekstraid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('kelas', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+    }
+
+    // Jurnal Ekstra
+    $table = new xmldb_table('local_jm_ekstra_jurnal');
+
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('ekstraid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tanggal', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('pembinaid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('materi', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('catatan', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '19', null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+    }
+
+    // Absensi Ekstra
+    $table = new xmldb_table('local_jm_ekstra_absen');
+
+    if (!$dbman->table_exists($table)) {
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('jurnalid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '19', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('keterangan', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $dbman->create_table($table);
+    }
+
+    upgrade_plugin_savepoint(true, 2026033001, 'local', 'jurnalmengajar');
+}
+
+// =====================================================
+// 2026033002 - Tambah cohortid di peserta ekstra
+// =====================================================
+if ($oldversion < 2026033002) {
+
+    $table = new xmldb_table('local_jm_ekstra_peserta');
+    $field = new xmldb_field('cohortid', XMLDB_TYPE_INTEGER, '19', null, null, null, null, 'userid');
+
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
+    upgrade_plugin_savepoint(true, 2026033002, 'local', 'jurnalmengajar');
+}
+
     return true;
 }
