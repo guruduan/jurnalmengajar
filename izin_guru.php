@@ -77,34 +77,32 @@ if ($mform->is_cancelled()) {
     $record->keperluan   = $data->keperluan;
     $record->waktuinput  = time();
 
-$insertid = $DB->insert_record('local_jurnalmengajar_suratizinguru', $record);
+    $insertid = $DB->insert_record('local_jurnalmengajar_suratizinguru', $record);
 
-// ================= WA KE KEPALA SEKOLAH =================
-$kepsek = get_nomor_kepala_sekolah();
+    // ================= WA KE KEPALA SEKOLAH =================
+    $kepsek = get_nomor_kepala_sekolah();
 
-if ($kepsek) {
+    if ($kepsek) {
+        $waktu = tanggal_indo(time(), 'judul');
+        $jam = date('H:i');
+        global $USER;
+        $penginput = $USER->lastname;
 
-    $waktu = tanggal_indo(time());
-    $sekolah = get_config('local_jurnalmengajar', 'nama_sekolah') ?: 'Nama Sekolah';
+        $pesan = "*📄 Surat Izin Guru/Pegawai*\n\n"
+               . "📅 Hari, tanggal: $waktu\n"
+               . "👤 Nama: {$choices[$data->userid]}\n"
+               . "🆔 NIP: {$data->nip}\n"
+               . "📝 Alasan: {$data->alasan}\n"
+               . "📌 Keperluan: {$data->keperluan}\n\n"
+               . "🕒 Pukul: $jam WITA\n"
+               . "📝 Diinput oleh: $penginput";
 
-    $pesan = "*📄 Surat Izin Guru/Pegawai*\n\n"
-           . "📅 Waktu: $waktu\n"
-           . "👤 Nama: {$choices[$data->userid]}\n"
-           . "🆔 NIP: {$data->nip}\n"
-           . "📝 Alasan: {$data->alasan}\n"
-           . "📌 Keperluan: {$data->keperluan}\n\n"
+        $tujuan = [$kepsek];
+        jurnalmengajar_kirim_wa($tujuan, $pesan);
+    }
 
-           . "_Dikirim kepada Kepala Sekolah_";
-
-    $tujuan = [$kepsek];
-
-    jurnalmengajar_kirim_wa($tujuan, $pesan);
+    redirect(new moodle_url('/local/jurnalmengajar/cetak_surat_izin_guru.php', ['id' => $insertid]));
 }
-
-redirect(new moodle_url('/local/jurnalmengajar/cetak_surat_izin_guru.php', ['id' => $insertid]));
-
-}
-
 // ================= TAMPILAN =================
 echo $OUTPUT->header();
 $mform->display();

@@ -12,7 +12,7 @@ $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
 $PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/jurnalmengajar/edit_jurnal.php', ['id' => $id]));
+$PAGE->set_url(new moodle_url('/local/jurnalmengajar/edit_jurnall.php', ['id' => $id]));
 $PAGE->set_title('Edit Jurnal (Admin)');
 $PAGE->set_heading('Edit Jurnal (Admin)');
 
@@ -127,7 +127,7 @@ $record->id = $id;
 $mform = new jurnal_form(null, null);
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/local/jurnalmengajar/all_jurnal.php'));
+    redirect(new moodle_url('/local/jurnalmengajar/all.php'));
 
 } else if ($data = $mform->get_data()) {
 
@@ -146,7 +146,7 @@ if ($mform->is_cancelled()) {
 
     $DB->update_record('local_jurnalmengajar', $record);
 
-    redirect(new moodle_url('/local/jurnalmengajar/all_jurnal.php'), 'Jurnal berhasil diperbarui.', 2);
+    redirect(new moodle_url('/local/jurnalmengajar/all_jurnall.php'), 'Jurnal berhasil diperbarui.', 2);
 }
 
 // 🔥 isi data lama ke form

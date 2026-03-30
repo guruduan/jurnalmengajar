@@ -36,8 +36,11 @@ if ($userid && $hari && $kelas) {
 // Ambil daftar guru untuk filter
 // ============================
 $sqlguru = "SELECT DISTINCT u.id, u.lastname
-            FROM {local_jurnalmengajar_jadwal} j
-            JOIN {user} u ON u.id = j.userid
+            FROM {role_assignments} ra
+            JOIN {user} u ON u.id = ra.userid
+            JOIN {role} r ON r.id = ra.roleid
+            WHERE r.shortname = 'gurujurnal'
+            AND u.deleted = 0
             ORDER BY u.lastname";
 
 $dataguru = $DB->get_records_sql($sqlguru);
@@ -101,7 +104,13 @@ echo html_writer::link(
     'Import CSV',
     ['class' => 'btn btn-secondary']
 );
+echo " ";
 
+echo html_writer::link(
+    new moodle_url('/local/jurnalmengajar/jadwal_add.php'),
+    'Tambah Jadwal',
+    ['class' => 'btn btn-success']
+);
 echo " ";
 
 echo html_writer::link(

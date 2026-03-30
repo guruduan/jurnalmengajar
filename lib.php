@@ -67,8 +67,7 @@ function get_user_nowa($userid) {
     ]);
 
     if (empty($nowa)) {
-        debugging("Field nowa kosong untuk user: $userid", DEBUG_DEVELOPER);
-        return null;
+        return null; // jangan debugging
     }
 
     return preg_replace('/[^0-9]/', '', $nowa);
@@ -370,7 +369,29 @@ function jurnalmengajar_get_siswa_by_kelas($kelas) {
         ORDER BY u.lastname
     ", [$kelas]);
 }
+function jurnalmengajar_get_stempel_path() {
+    global $CFG;
 
+    $context = context_system::instance();
+    $fs = get_file_storage();
+
+    $files = $fs->get_area_files(
+        $context->id,
+        'local_jurnalmengajar',
+        'stempel',
+        0,
+        'itemid, filepath, filename',
+        false
+    );
+
+    foreach ($files as $file) {
+        $tempfile = $CFG->tempdir . '/' . $file->get_filename();
+        $file->copy_content_to($tempfile);
+        return $tempfile;
+    }
+
+    return '';
+}
 // ===============================
 // Ambil NIS user dari profile field
 // ===============================
@@ -383,4 +404,31 @@ function jurnalmengajar_get_nis_user($userid) {
         JOIN {user_info_field} f ON f.id = d.fieldid
         WHERE f.shortname = 'nis' AND d.userid = ?
     ", [$userid]);
+}
+// =================================
+// Ambil ttd tandatangan kepsek
+// =================================
+function jurnalmengajar_get_ttd_path() {
+    global $CFG;
+
+    $context = context_system::instance();
+    $fs = get_file_storage();
+
+    $files = $fs->get_area_files(
+        $context->id,
+        'local_jurnalmengajar',
+        'ttd',
+        0,
+        'itemid, filepath, filename',
+        false
+    );
+
+    if ($files) {
+        $file = reset($files);
+        $temp = $CFG->tempdir . '/' . $file->get_filename();
+        $file->copy_content_to($temp);
+        return $temp;
+    }
+
+    return '';
 }

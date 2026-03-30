@@ -14,4 +14,4 @@ $record = $DB->get_record('local_jurnalmengajar', [
 ], '*', MUST_EXIST);
 $DB->delete_records('local_jurnalmengajar', ['id' => $id]);
 
-redirect(new moodle_url('/local/jurnalmengajar/all_jurnal.php'), 'Entri berhasil dihapus.', 2);
+redirect(new moodle_url('/local/jurnalmengajar/all_jurnall.php'), 'Entri berhasil dihapus.', 2);

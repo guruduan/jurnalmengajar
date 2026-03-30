@@ -164,10 +164,18 @@ if ($kelasid) {
        . "_Dikirim ke Wali kelas dan Guru ybs sebagai laporan_";
 
     // Tujuan
-    $tujuan = [
-        get_user_nowa($USER->id),
-        get_nomor_wali_kelas($kelasid)
-    ];
+    $tujuan = [];
+
+$nowaguru = get_user_nowa($USER->id);
+$nowawali = get_nomor_wali_kelas($kelasid);
+
+if (!empty($nowaguru)) {
+    $tujuan[] = $nowaguru;
+}
+
+if (!empty($nowawali)) {
+    $tujuan[] = $nowawali;
+}
 
     // Kirim WA
     jurnalmengajar_kirim_wa($tujuan, $pesan);

@@ -1,8 +1,8 @@
 <?php
 require_once('../../config.php');
+require_login();
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/local/jurnalmengajar/libwa.php');
-$stempel_path = jurnalmengajar_get_stempel_path();
+require_once($CFG->dirroot.'/local/jurnalmengajar/lib.php');
 
 global $DB, $USER;
 $namasekolah = get_config('local_jurnalmengajar', 'nama_sekolah');
@@ -40,8 +40,6 @@ date_default_timezone_set('Asia/Makassar');
 $fmt = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Makassar', IntlDateFormatter::GREGORIAN);
 $tanggal = $fmt->format($surat->waktuinput);
 $jam = date('H:i');
-// ⬇️ Kirim WhatsApp real-time ke Kepala Sekolah
-kirim_wa_izin_guru($guru, $nip, $surat->alasan, $surat->keperluan, $tanggal, $jam, $userpencetak->lastname);
 
 // Fungsi untuk membentuk HTML surat izin guru
 function suratizin_guru_html($guru, $nip, $surat, $tanggal, $userpencetak) {
@@ -85,23 +83,24 @@ $pdf = new pdf();
 $pdf->AddPage('P', 'F4');
 $pdf->SetFont('helvetica', '', 10);
 
-require_once($CFG->dirroot.'/local/jurnalmengajar/lib.php');
-$stempel = jurnalmengajar_get_stempel_path();
+
+$ttd = jurnalmengajar_get_ttd_path();
 
 // Cetak 4 surat per halaman
 $htmlsurat = suratizin_guru_html($guru, $nip, $surat, $tanggal, $userpencetak);
 $separator = '<hr style="border-top: 1px dashed #000; margin:8px 0;">';
 
 $pdf->writeHTML($htmlsurat, true, false, true, false, '');
-if (file_exists($stempel)) {
+if (file_exists($ttd)) {
     // Geser ke posisi ttd kepala sekolah (sesuaikan jika perlu)
-    $pdf->Image($stempel, 110, $pdf->GetY() - 36, 20);
+    $pdf->Image($ttd, 110, $pdf->GetY() - 36, 20);
+
 }
 $pdf->writeHTML($separator, true, false, true, false, '');
 $pdf->writeHTML($htmlsurat, true, false, true, false, '');
-if (file_exists($stempel)) {
+if (file_exists($ttd)) {
     // Geser ke posisi ttd kepala sekolah (sesuaikan jika perlu)
-    $pdf->Image($stempel, 110, $pdf->GetY() - 36, 20);
+$pdf->Image($ttd, 110, $pdf->GetY() - 36, 20);
 }
 $pdf->writeHTML($separator, true, false, true, false, '');
 

@@ -6,12 +6,10 @@ if ($hassiteconfig) {
     // =========================
     // KATEGORI PLUGIN
     // =========================
-    if (!$ADMIN->locate('local_jurnalmengajar_cat')) {
     $ADMIN->add('localplugins', new admin_category(
         'local_jurnalmengajar_cat',
         'Jurnal Mengajar'
     ));
-}
 
     // =========================
     // HALAMAN SETTING UTAMA
@@ -104,6 +102,15 @@ $settings->add(new admin_setting_configstoredfile(
     'Upload stempel (PNG transparan)',
     'stempel'
 ));
+// ==============================
+// TTD Kepala Sekolah
+// ==============================
+$settings->add(new admin_setting_configstoredfile(
+    'local_jurnalmengajar/ttd',
+    'Tanda Tangan',
+    'Upload tanda tangan kepala sekolah (PNG)',
+    'ttd'
+));
 $settings->add(new admin_setting_configtext(
     'local_jurnalmengajar/nomor_kepsek',
     'Nomor Kepala Sekolah',
@@ -185,23 +192,4 @@ Contoh:
         new moodle_url('/local/jurnalmengajar/wali_kelas.php'),
         'moodle/site:config'
     ));
-    
-    //
-    // PEMBINA EKSTRA
-    //
-    $ADMIN->add('local_jurnalmengajar_cat', new admin_externalpage(
-    'local_jurnalmengajar_pembina_ekstra',
-    'Mapping Pembina Ekstrakurikuler',
-    new moodle_url('/local/jurnalmengajar/pembina_ekstra.php'),
-    'moodle/site:config'
-));
-//
-// PESERTA EKTRA
-//
-$ADMIN->add('local_jurnalmengajar_cat', new admin_externalpage(
-    'local_jurnalmengajar_peserta_ekstra',
-    'Peserta Ekstrakurikuler',
-    new moodle_url('/local/jurnalmengajar/peserta_ekstra.php'),
-    'moodle/site:config'
-));
 }

@@ -12,4 +12,4 @@ $record = $DB->get_record('local_jurnalmengajar_suratizinguru', ['id' => $id], '
 // Hapus
 $DB->delete_records('local_jurnalmengajar_suratizinguru', ['id' => $id]);
 
-redirect(new moodle_url('/local/jurnalmengajar/input_surat_izin_guru.php'), 'Data berhasil dihapus', 2);
+redirect(new moodle_url('/local/jurnalmengajar/izin_guru.php'), 'Data berhasil dihapus', 2);
