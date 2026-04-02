@@ -16,6 +16,34 @@ require_once(__DIR__ . '/lib.php');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Riwayat Jurnal Saya');
+$bulan = optional_param('bulan', date('n'), PARAM_INT);
+$tahun = optional_param('tahun', date('Y'), PARAM_INT);
+
+echo html_writer::start_tag('form', ['method' => 'get', 'style' => 'margin-bottom:15px']);
+
+$bulanopsi = [
+    1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',
+    5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',
+    9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+];
+
+echo 'Bulan: ';
+echo html_writer::select($bulanopsi, 'bulan', $bulan, false);
+
+echo ' Tahun: ';
+$tahunopsi = [];
+for ($t = date('Y'); $t >= date('Y')-5; $t--) {
+    $tahunopsi[$t] = $t;
+}
+echo html_writer::select($tahunopsi, 'tahun', $tahun, false);
+
+echo html_writer::tag('button', 'Tampilkan', [
+    'type'=>'submit',
+    'class'=>'btn btn-primary',
+    'style'=>'margin-left:10px'
+]);
+
+echo html_writer::end_tag('form');
 // Tombol kembali dan export
 echo html_writer::start_tag('div', ['style' => 'margin-bottom:15px']);
 
@@ -41,11 +69,9 @@ echo html_writer::end_tag('form');
 
 echo html_writer::end_tag('div');
 
-echo html_writer::end_tag('div');
-
 // Ambil data bulan berjalan
-$awalbulan = strtotime(date('Y-m-01 00:00:00'));
-$akhirbulan = strtotime(date('Y-m-01 00:00:00', strtotime('+1 month')));
+$awalbulan = strtotime("$tahun-$bulan-01 00:00:00");
+$akhirbulan = strtotime("+1 month", $awalbulan);
 
 $sql = "SELECT *
           FROM {local_jurnalmengajar}
@@ -62,6 +88,9 @@ $params = [
 
 $entries = $DB->get_records_sql($sql, $params);
 
+echo html_writer::tag('h4',
+    'Riwayat Bulan ' . $bulanopsi[$bulan] . ' ' . $tahun
+);
 if ($entries) {
 
     echo html_writer::start_tag('table', ['class' => 'generaltable']);
