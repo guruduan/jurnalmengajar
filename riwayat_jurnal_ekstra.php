@@ -23,7 +23,8 @@ echo '<div style="margin-bottom:15px;">
     <a class="btn btn-success" href="export_jurnal_ekstra.php">🌍 Ekspor Jurnal per Bulan</a>
 </div>';
 
-$awalbulan = strtotime(date('Y-m-01 00:00:00'));
+// Filter bulan ini berdasarkan TANGGAL jurnal
+$awalbulan  = strtotime(date('Y-m-01 00:00:00'));
 $akhirbulan = strtotime(date('Y-m-01 00:00:00', strtotime('+1 month')));
 
 $sql = "SELECT j.*, e.namaekstra, u.firstname, u.lastname,
@@ -34,15 +35,15 @@ $sql = "SELECT j.*, e.namaekstra, u.firstname, u.lastname,
      LEFT JOIN {local_jm_ekstra_absen} a ON a.jurnalid = j.id
      LEFT JOIN {user} us ON us.id = a.userid
          WHERE j.pembinaid = :userid
-           AND j.timecreated >= :awal
-           AND j.timecreated < :akhir
+           AND j.tanggal >= :awal
+           AND j.tanggal < :akhir
       GROUP BY j.id
-      ORDER BY j.id DESC";
-      
+      ORDER BY j.tanggal DESC";
+
 $params = [
     'userid' => $USER->id,
-    'awal' => $awalbulan,
-    'akhir' => $akhirbulan
+    'awal'   => $awalbulan,
+    'akhir'  => $akhirbulan
 ];
 
 $entries = $DB->get_records_sql($sql, $params);
@@ -56,10 +57,11 @@ if ($entries) {
         html_writer::tag('th', 'No') .
         html_writer::tag('th', 'Tanggal') .
         html_writer::tag('th', 'Ekstra') .
-        html_writer::tag('th', 'Pembina') .
         html_writer::tag('th', 'Materi') .
+        html_writer::tag('th', 'Kegiatan') .
+        html_writer::tag('th', 'Catatan') .
         html_writer::tag('th', 'Absen') .
-        html_writer::tag('th', 'Waktu') 
+        html_writer::tag('th', 'Waktu Input')
     );
 
     echo html_writer::end_tag('thead');
@@ -74,11 +76,11 @@ if ($entries) {
         echo html_writer::tag('td', $no++);
         echo html_writer::tag('td', tanggal_indo($e->tanggal));
         echo html_writer::tag('td', $e->namaekstra);
-        echo html_writer::tag('td', $e->firstname . ' ' . $e->lastname);
         echo html_writer::tag('td', shorten_text($e->materi, 40));
+        echo html_writer::tag('td', shorten_text($e->kegiatan, 40));
+        echo html_writer::tag('td', shorten_text($e->catatan, 40));
         echo html_writer::tag('td', shorten_text($e->absensi, 40));
         echo html_writer::tag('td', tanggal_indo($e->timecreated));
-
 
         echo html_writer::end_tag('tr');
     }
@@ -87,7 +89,7 @@ if ($entries) {
     echo html_writer::end_tag('table');
 
 } else {
-    echo html_writer::tag('p', 'Belum ada jurnal ekstrakurikuler.');
+    echo html_writer::tag('p', 'Belum ada jurnal ekstrakurikuler bulan ini.');
 }
 
 echo $OUTPUT->footer();

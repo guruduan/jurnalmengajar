@@ -77,16 +77,19 @@ if ($selected_ekstra) {
     echo '<h3>Form Jurnal</h3>';
 
     echo '<form method="post" action="simpan_jurnal_ekstra.php">';
-    echo '<input type="hidden" name="ekstraid" value="'.$selected_ekstra.'">';
+echo '<input type="hidden" name="ekstraid" value="'.$selected_ekstra.'">';
 
-    echo 'Tanggal:<br>';
-    echo '<input type="date" name="tanggal" value="'.date('Y-m-d').'"><br><br>';
+echo 'Tanggal:<br>';
+echo '<input type="date" name="tanggal" value="'.date('Y-m-d').'"><br><br>';
 
-    echo 'Materi :<br>';
-    echo '<textarea name="materi" rows="4" cols="70" required></textarea><br><br>';
+echo 'Materi :<br>';
+echo '<textarea name="materi" rows="4" cols="70" required></textarea><br><br>';
 
-    echo 'Kegiatan:<br>';
-    echo '<textarea name="catatan" rows="3" cols="70"></textarea><br><br>';
+echo 'Kegiatan:<br>';
+echo '<textarea name="kegiatan" rows="4" cols="70"></textarea><br><br>';
+
+echo 'Catatan:<br>';
+echo '<textarea name="catatan" rows="3" cols="70"></textarea><br><br>';
 
     echo '<b>Absensi Murid ('.count($siswa).' murid)</b><br>';
 
