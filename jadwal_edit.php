@@ -11,6 +11,7 @@ global $DB, $PAGE, $OUTPUT;
 $userid = required_param('userid', PARAM_INT);
 $hari   = required_param('hari', PARAM_TEXT);
 $kelas  = required_param('kelas', PARAM_TEXT);
+$guru = optional_param('guru', 0, PARAM_INT);
 
 // Ambil nama guru
 $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hari_baru  = required_param('hari', PARAM_TEXT);
     $kelas_baru = required_param('kelas', PARAM_TEXT);
     $jamlist    = optional_param('jamke', '', PARAM_TEXT);
+    $guru = required_param('guru', PARAM_INT);
 
     // Hapus jadwal lama
     $DB->delete_records('local_jurnalmengajar_jadwal', [
@@ -77,15 +79,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    redirect(new moodle_url('/local/jurnalmengajar/jadwal_manage.php'),
-             'Jadwal berhasil disimpan', 2);
+redirect(new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
+    'guru' => $guru
+]), 'Jadwal berhasil disimpan', 2);
 }
 
 // ============================
 // Tampilan Halaman
 // ============================
 $PAGE->set_context($context);
-$PAGE->set_url('/local/jurnalmengajar/jadwal_edit.php');
+$PAGE->set_url(new moodle_url('/local/jurnalmengajar/jadwal_edit.php', [
+    'userid' => $userid,
+    'hari'   => $hari,
+    'kelas'  => $kelas,
+    'guru'   => $guru
+]));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title('Edit Jadwal Mengajar');
 $PAGE->set_heading('Edit Jadwal Mengajar');
@@ -94,7 +102,10 @@ echo $OUTPUT->header();
 
 echo "<form method='post'>";
 echo "<input type='hidden' name='sesskey' value='".sesskey()."'>";
-
+echo "<input type='hidden' name='guru' value='$guru'>";
+echo "<input type='hidden' name='userid' value='$userid'>";
+echo "<input type='hidden' name='hari' value='$hari'>";
+echo "<input type='hidden' name='kelas' value='$kelas'>";
 echo "<table class='generaltable'>";
 
 echo "<tr><td>Guru</td><td>{$user->firstname} {$user->lastname}</td></tr>";
@@ -124,7 +135,7 @@ echo "</table>";
 echo "<br>";
 echo "<input type='submit' value='Simpan' class='btn btn-primary'>";
 echo " ";
-echo "<a href='jadwal_manage.php' class='btn btn-secondary'>Kembali</a>";
+echo "<a href='jadwal_manage.php?guru=$guru' class='btn btn-secondary'>Kembali</a>";
 
 echo "</form>";
 

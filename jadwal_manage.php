@@ -7,14 +7,17 @@ $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
 $PAGE->set_context($context);
-$PAGE->set_url('/local/jurnalmengajar/jadwal_manage.php');
+global $DB, $USER;
+$filterguru = optional_param('guru', $USER->id, PARAM_INT);
+
+$PAGE->set_url(new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
+    'guru' => $filterguru
+]));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title('Manajemen Jadwal Mengajar');
 $PAGE->set_heading('Manajemen Jadwal Mengajar');
 
-echo $OUTPUT->header();
 
-global $DB, $USER;
 
 // ============================
 // Hapus jadwal (per grup)
@@ -29,9 +32,13 @@ if ($userid && $hari && $kelas) {
         'hari' => $hari,
         'kelas' => $kelas
     ]);
-    echo $OUTPUT->notification('Jadwal berhasil dihapus', 'notifysuccess');
+
+    redirect(new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
+        'guru' => $filterguru
+    ]), 'Jadwal berhasil dihapus', 2);
 }
 
+echo $OUTPUT->header();
 // ============================
 // Ambil daftar guru untuk filter
 // ============================
@@ -49,9 +56,6 @@ $listguru = [];
 foreach ($dataguru as $g) {
     $listguru[$g->id] = $g->lastname;
 }
-
-// Default guru = user login
-$filterguru = optional_param('guru', $USER->id, PARAM_INT);
 
 // ============================
 // Ambil jadwal
@@ -90,6 +94,7 @@ foreach ($jadwal as $j) {
 
     $grouped[$key]['jamke'][] = $j->jamke;
 }
+
 
 // Urutkan berdasarkan hari
 usort($grouped, function($a, $b) {
@@ -140,62 +145,70 @@ echo html_writer::empty_tag('input', [
 ]);
 
 echo html_writer::end_tag('form');
-
-// ============================
-// Tabel jadwal
-// ============================
-echo "<table class='generaltable'>";
-echo "<tr>
-        <th>No</th>
-        <th>Hari</th>
-        <th>Guru</th>
-        <th>Kelas</th>
-        <th>Jam</th>
-        <th>Edit</th>
-        <th>Hapus</th>
-      </tr>";
-
-$no = 1;
-$hari_sebelumnya = '';
-
+$namaguru = $listguru[$filterguru] ?? '-';
+echo "<h4>Jadwal Guru: $namaguru</h4>";
+$totaljam = 0;
 foreach ($grouped as $g) {
+    $totaljam += count($g['jamke']);
+}
+echo "<p>Total Jam Mengajar: <b>$totaljam</b></p>";
+if (!empty($grouped)) {
 
-    sort($g['jamke']);
-    $jamgabung = implode(',', $g['jamke']);
+    echo "<table class='generaltable'>";
+    echo "<tr>
+            <th>No</th>
+            <th>Hari</th>
+            <th>Guru</th>
+            <th>Kelas</th>
+            <th>Jam</th>
+            <th>Edit</th>
+            <th>Hapus</th>
+          </tr>";
 
-    $hapusurl = new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
-        'userid' => $g['userid'],
-        'hari' => $g['hari'],
-        'kelas' => $g['kelas']
-    ]);
+    $no = 1;
+    $hari_sebelumnya = '';
 
-    $editurl = new moodle_url('/local/jurnalmengajar/jadwal_edit.php', [
-        'userid' => $g['userid'],
-        'hari' => $g['hari'],
-        'kelas' => $g['kelas']
-    ]);
+    foreach ($grouped as $g) {
 
-    echo "<tr>";
+        sort($g['jamke']);
+        $jamgabung = implode(',', $g['jamke']);
 
-    if ($hari_sebelumnya != $g['hari']) {
-        echo "<td>$no</td>";
-        echo "<td>{$g['hari']}</td>";
-        $hari_sebelumnya = $g['hari'];
-        $no++;
-    } else {
-        echo "<td></td>";
-        echo "<td></td>";
+        $hapusurl = new moodle_url('/local/jurnalmengajar/jadwal_manage.php', [
+            'userid' => $g['userid'],
+            'hari' => $g['hari'],
+            'kelas' => $g['kelas'],
+            'guru' => $filterguru
+        ]);
+
+        $editurl = new moodle_url('/local/jurnalmengajar/jadwal_edit.php', [
+            'userid' => $g['userid'],
+            'hari' => $g['hari'],
+            'kelas' => $g['kelas'],
+            'guru' => $filterguru
+        ]);
+
+        echo "<tr>";
+
+        if ($hari_sebelumnya != $g['hari']) {
+            echo "<td>$no</td>";
+            echo "<td>{$g['hari']}</td>";
+            $hari_sebelumnya = $g['hari'];
+            $no++;
+        } else {
+            echo "<td></td>";
+            echo "<td></td>";
+        }
+
+        echo "<td>{$g['lastname']}</td>";
+        echo "<td>{$g['kelas']}</td>";
+        echo "<td>$jamgabung</td>";
+        echo "<td><a class='btn btn-warning' href='$editurl'>Edit</a></td>";
+        echo "<td><a class='btn btn-danger' href='$hapusurl' onclick=\"return confirm('Hapus jadwal?')\">Hapus</a></td>";
+
+        echo "</tr>";
     }
 
-    echo "<td>{$g['lastname']}</td>";
-    echo "<td>{$g['kelas']}</td>";
-    echo "<td>$jamgabung</td>";
-    echo "<td><a class='btn btn-warning' href='$editurl'>Edit</a></td>";
-    echo "<td><a class='btn btn-danger' href='$hapusurl' onclick=\"return confirm('Hapus jadwal?')\">Hapus</a></td>";
-
-    echo "</tr>";
+    echo "</table>";
 }
-
-echo "</table>";
 
 echo $OUTPUT->footer();
