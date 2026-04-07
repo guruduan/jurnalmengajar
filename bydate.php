@@ -26,8 +26,8 @@ echo html_writer::end_div();
 global $DB;
 
 // Tangani input tanggal
-$tanggal = optional_param('tanggal', date('Y-m-d'), PARAM_RAW);
-$timestamp = strtotime($tanggal);
+$tanggal = optional_param('tanggal', date('Y-m-d'), PARAM_TEXT);
+$timestamp = strtotime($tanggal) ?: time();
 $start = strtotime(date('Y-m-d 00:00:00', $timestamp));
 $end   = strtotime(date('Y-m-d 23:59:59', $timestamp));
 
@@ -61,11 +61,12 @@ echo html_writer::div('', 'mt-2', ['id' => 'hari-terpilih']);
 
 
 // Ambil entri
-$sql = "SELECT j.*, u.lastname
-        FROM {local_jurnalmengajar} j
-        JOIN {user} u ON j.userid = u.id
-        WHERE j.timecreated BETWEEN :start AND :end
-        ORDER BY j.timecreated ASC";
+$sql = "SELECT j.*, u.lastname, c.name as namakelas
+FROM {local_jurnalmengajar} j
+JOIN {user} u ON j.userid = u.id
+LEFT JOIN {cohort} c ON j.kelas = c.id
+WHERE j.timecreated BETWEEN :start AND :end
+ORDER BY j.timecreated ASC";
 $entries = $DB->get_records_sql($sql, ['start' => $start, 'end' => $end]);
 
 // Tampilkan entri
@@ -77,23 +78,26 @@ if ($entries) {
     ])));
     echo html_writer::end_tag('thead') . html_writer::start_tag('tbody');
     $no = 1;
-    foreach ($entries as $e) {
-        $abs = json_decode($e->absen, true);
-        $abtxt = is_array($abs) ? implode(', ', array_map(fn($n, $a) => "$n ($a)", array_keys($abs), $abs)) : $e->absen;
-        $kelas = $DB->get_field('cohort', 'name', ['id' => $e->kelas]) ?? '???';
-        echo html_writer::tag('tr', implode('', [
-            html_writer::tag('td', $no++),
-            html_writer::tag('td', $e->lastname),
-            html_writer::tag('td', $kelas),
-            html_writer::tag('td', $e->jamke),
-            html_writer::tag('td', $e->matapelajaran),
-            html_writer::tag('td', shorten_text($e->materi, 30), ['title' => $e->materi]),
-            html_writer::tag('td', shorten_text($abtxt, 25), ['title' => $abtxt]),
-            html_writer::tag('td', tanggal_indo($e->timecreated)),
-            html_writer::tag('td', shorten_text($e->keterangan, 25), ['title' => $e->keterangan])
-        ]));
-    }
-    echo html_writer::end_tag('tbody') . html_writer::end_tag('table');
+foreach ($entries as $e) {
+    $abs = json_decode($e->absen, true);
+    $abtxt = is_array($abs) ? implode(', ', array_map(fn($n, $a) => "$n ($a)", array_keys($abs), $abs)) : $e->absen;
+    $kelas = $e->namakelas ?? '???';
+
+    echo html_writer::tag('tr', implode('', [
+        html_writer::tag('td', $no++),
+        html_writer::tag('td', format_string($e->lastname)),
+        html_writer::tag('td', format_string($kelas)),
+        html_writer::tag('td', $e->jamke),
+        html_writer::tag('td', format_string($e->matapelajaran)),
+        html_writer::tag('td', format_string(shorten_text($e->materi, 30)), ['title' => format_string($e->materi)]),
+        html_writer::tag('td', format_string(shorten_text($abtxt, 25)), ['title' => format_string($abtxt)]),
+        html_writer::tag('td', tanggal_indo($e->timecreated)),
+        html_writer::tag('td', format_string(shorten_text($e->keterangan, 25)), ['title' => format_string($e->keterangan)])
+    ]));
+}
+
+// ✅ Tutup di sini (setelah loop)
+echo html_writer::end_tag('tbody') . html_writer::end_tag('table');
 } else {
     echo html_writer::div('Tidak ada entri jurnal pada tanggal tersebut.', 'alert alert-warning');
 }
