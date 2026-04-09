@@ -143,6 +143,17 @@ Contoh:
 2026-03-23 s/d 2026-03-25',
     ''
 ));
+// ==============================
+// CUT OFF KELAS XII
+// ==============================
+$settings->add(new admin_setting_configtextarea(
+    'local_jurnalmengajar/cutoff_xii',
+    'Tanggal Berhenti Kelas XII',
+    'Isi tanggal berhenti mengajar kelas XII format YYYY-MM-DD.
+Contoh:
+2026-04-06',
+    ''
+));
 
     // =========================
     // KONFIGURASI WABLAS
@@ -157,7 +168,7 @@ Contoh:
         'local_jurnalmengajar/apikey',
         'API Key',
         '',
-        'cek dashboard wablas',
+        'Isi sesuai dashboard Wablas',
         PARAM_RAW_TRIMMED
     ));
 
@@ -165,7 +176,7 @@ Contoh:
         'local_jurnalmengajar/secretkey',
         'Secret Key',
         '',
-        'cek dashboard wablas',
+        'Isi sesuai dashboard Wablas',
         PARAM_RAW_TRIMMED
     ));
     
@@ -173,14 +184,14 @@ Contoh:
         'local_jurnalmengajar/wablas_url',
         'Wablas URL',
         '',
-        'cek dashboard wablas'
+        'Isi sesuai dashboard Wablas'
     ));
 
     $settings->add(new admin_setting_configtext(
         'local_jurnalmengajar/wablas_group',
         'Group WhatsApp',
         'Group ID atau JID (120xxx@g.us)',
-        'cek dashboard wablas'
+        'Isi sesuai dashboard Wablas'
     ));
 
     // =========================

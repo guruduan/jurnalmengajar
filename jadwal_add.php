@@ -34,6 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas  = required_param('kelas', PARAM_TEXT);
     $jamke  = required_param('jamke', PARAM_TEXT);
 
+    // simpan untuk ditampilkan kembali
+    $selected_userid = $userid;
+    $selected_hari   = $hari;
+    $selected_kelas  = $kelas;
+    $selected_jamke  = $jamke;
+
     $jamarray = explode(',', $jamke);
 
     foreach ($jamarray as $jam) {
@@ -50,8 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $DB->insert_record('local_jurnalmengajar_jadwal', $record);
     }
 
-    redirect(new moodle_url('/local/jurnalmengajar/jadwal_manage.php'),
-             'Jadwal berhasil ditambahkan', 2);
+    echo $OUTPUT->notification('Jadwal berhasil ditambahkan', 'notifysuccess');
 }
 
 // Tampilan
@@ -69,7 +74,7 @@ echo "<input type='hidden' name='sesskey' value='".sesskey()."'>";
 echo "<table class='generaltable'>";
 
 echo "<tr><td>Guru</td><td>";
-echo html_writer::select($listguru, 'userid');
+echo html_writer::select($listguru, 'userid', $selected_userid);
 echo "</td></tr>";
 
 $hari_list = jurnalmengajar_get_hari_sekolah();
@@ -77,7 +82,8 @@ $hari_list = jurnalmengajar_get_hari_sekolah();
 echo "<tr><td>Hari</td><td>";
 echo "<select name='hari'>";
 foreach ($hari_list as $h) {
-    echo "<option value='$h'>$h</option>";
+    $selected = ($h == $selected_hari) ? "selected" : "";
+    echo "<option value='$h' $selected>$h</option>";
 }
 echo "</select>";
 echo "</td></tr>";

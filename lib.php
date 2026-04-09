@@ -190,7 +190,34 @@ function jurnalmengajar_cek_libur($tanggal) {
 
     return false;
 }
+/**
+ * FUNGSI tanggal berhenti mengajar kelas XII
+ */
+function jurnalmengajar_get_cutoff_xii($timestamp) {
+    $config = get_config('local_jurnalmengajar', 'cutoff_xii');
 
+    if (empty($config)) return null;
+
+    $tahun = date('Y', $timestamp);
+
+    $lines = preg_split('/\r\n|\r|\n/', $config);
+
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line == '') continue;
+
+        // validasi format YYYY-MM-DD
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $line)) {
+            continue; // skip kalau salah format
+        }
+
+        if (strpos($line, $tahun . '-') === 0) {
+            return strtotime($line);
+        }
+    }
+
+    return null;
+}
 /**
  * Cek boleh kirim WA atau tidak
  */
@@ -328,14 +355,24 @@ return true;
 // ===============================
 // Fungsi ambil beban mengajar guru
 // ===============================
-function jurnalmengajar_get_beban_jam_guru() {
+function jurnalmengajar_get_beban_jam_guru_by_date($timestamp) {
     require_once(__DIR__.'/jadwal_acuan_lib.php');
 
     $jadwal = jurnalmengajar_get_jadwal_acuan();
     $beban = [];
 
+    $cutoff = jurnalmengajar_get_cutoff_xii($timestamp);
+
     foreach ($jadwal as $j) {
         $userid = $j['userid'];
+        $kelas  = trim($j['kelas'] ?? '');
+
+        // 🔥 FIX UTAMA DI SINI
+        if ($cutoff && strtotime(date('Y-m-d', $timestamp)) >= strtotime(date('Y-m-d', $cutoff))) {
+            if (preg_match('/\bXII\b/i', $kelas)) {
+                continue;
+            }
+        }
 
         if (!isset($beban[$userid])) {
             $beban[$userid] = 0;

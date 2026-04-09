@@ -32,7 +32,6 @@ if ($param_mingguke > 0) {
 
 // Filter tambahan
 $filter_lastname = optional_param('lastname', '', PARAM_RAW);
-$filter_bulan = optional_param('bulan', 0, PARAM_INT);
 
 // Tentukan rentang waktu minggu ke-$mingguke
 $awal_minggu = clone $tanggal_awal;
@@ -52,7 +51,7 @@ $entries = $DB->get_records_select(
 );
 
 // Ambil beban guru bukan dari file JSON
-$beban = jurnalmengajar_get_beban_jam_guru();
+$beban = jurnalmengajar_get_beban_jam_guru_by_date($tanggal_awal_minggu_ini);
 
 // Siapkan user
 $all_userids = array_unique(array_map(fn($e) => $e->userid, $entries));
@@ -82,19 +81,10 @@ echo html_writer::tag('h3', "Rekap Minggu ke-$mingguke (" .
 
 echo '<form method="get">';
 echo '<label for="mingguke">Pilih Minggu ke: </label>';
-echo '<select name="mingguke">';
+echo '<select name="mingguke" onchange="this.form.submit()">';
 for ($i = 1; $i <= 20; $i++) {
     $selected = ($i == $mingguke) ? 'selected' : '';
     echo "<option value=\"$i\" $selected>$i</option>";
-}
-echo '</select> ';
-
-echo '<label for="bulan">🔍 Filter Bulan: </label>';
-echo '<select name="bulan">';
-echo '<option value="0"' . ($filter_bulan == 0 ? ' selected' : '') . '>Semua</option>';
-for ($i = 1; $i <= 12; $i++) {
-    $selected = ($filter_bulan == $i) ? ' selected' : '';
-    echo "<option value=\"$i\"$selected>" . date('F', mktime(0, 0, 0, $i, 1)) . "</option>";
 }
 echo '</select> ';
 
@@ -102,7 +92,7 @@ echo '<label for="lastname">Filter Guru: </label>';
 echo '<select name="lastname" onchange="this.form.submit()">';
 echo '<option value="">Semua</option>';
 foreach ($all_users as $id => $ln) {
-    $formatted_ln = ucwords(strtolower($ln));
+    $formatted_ln = ucwords($ln);
     $selected = ($filter_lastname === $ln) ? 'selected' : '';
     echo "<option value=\"$ln\" $selected>$formatted_ln</option>";
 }
@@ -113,31 +103,47 @@ echo '</form>';
 
 // Proses rekap
 $rekap = [];
-$user_cache = [];
 
 foreach ($entries as $e) {
     $userid = $e->userid;
 
-    if (!isset($user_cache[$userid])) {
-        $user_cache[$userid] = $DB->get_record('user', ['id' => $userid], 'id, lastname');
-    }
-    $user = $user_cache[$userid];
+    if (!isset($all_users[$userid])) continue;
 
-    if ($filter_lastname && strtolower($user->lastname) !== strtolower($filter_lastname)) continue;
-    if ($filter_bulan > 0 && (int)date('n', $e->timecreated) !== $filter_bulan) continue;
+    $lastname = $all_users[$userid];
 
-    $jam = count(array_filter(explode(',', $e->jamke)));
+    if ($filter_lastname && strtolower($lastname) !== strtolower($filter_lastname)) continue;
+
+    $jam = !empty($e->jamke)
+        ? count(array_filter(explode(',', $e->jamke)))
+        : 0;
 
     if (!isset($rekap[$userid])) $rekap[$userid] = 0;
     $rekap[$userid] += $jam;
 }
 
-// Urutkan berdasarkan lastname
-uksort($rekap, function($a, $b) use ($user_cache) {
-    return strcmp(strtolower($user_cache[$a]->lastname ?? ''), strtolower($user_cache[$b]->lastname ?? ''));
+// Urutkan berdasarkan nama guru
+uksort($rekap, function($a, $b) use ($all_users) {
+    return strcmp(
+        strtolower($all_users[$a] ?? ''),
+        strtolower($all_users[$b] ?? '')
+    );
 });
 
-// === Tambahkan wrapper scroll untuk sticky header ===
+// tambahkan di atas tabel
+$cutoff = jurnalmengajar_get_cutoff_xii($tanggal_awal_minggu_ini);
+
+if ($cutoff) {
+    echo html_writer::div(
+        'Cutoff kelas XII: ' . date('d M Y', $cutoff),
+        'alert alert-info'
+    );
+} else {
+    echo html_writer::div(
+        '⚠️ Cutoff kelas XII belum disetting',
+        'alert alert-warning'
+    );
+}
+// Tabel
 echo html_writer::start_div('table-wrapper');
 echo html_writer::start_tag('table', ['class' => 'generaltable']);
 echo html_writer::start_tag('thead');
@@ -155,31 +161,50 @@ echo html_writer::start_tag('tbody');
 
 $no = 1;
 foreach ($rekap as $userid => $jumlahjam) {
-    $user = $user_cache[$userid];
+
+    $lastname = $all_users[$userid];
+    $nama = ucwords($lastname);
 
     $beban_minggu = $beban[$userid] ?? 0;
 
-    if ($beban_minggu > 0) {
-        $persen = round(($jumlahjam / $beban_minggu) * 100);
-    } else {
-        $persen = 0;
+    $persen = ($beban_minggu > 0)
+        ? round(($jumlahjam / $beban_minggu) * 100)
+        : 0;
+
+    // WARNA
+    $style = '';
+    if ($persen >= 80) {
+        $style = 'color:green;font-weight:bold';
+    } elseif ($persen < 50) {
+        $style = 'color:red;font-weight:bold';
     }
 
-    echo html_writer::start_tag('tr');
+// WARNA BARIS
+$tr_style = '';
+if ($persen < 50) {
+    $tr_style = 'background-color:#ffe5e5';
+}
+
+echo html_writer::start_tag('tr', ['style' => $tr_style]);
+
     echo html_writer::tag('td', $no++);
-    echo html_writer::tag('td', $user->lastname);
+    echo html_writer::tag('td', $nama);
     echo html_writer::tag('td', $mingguke);
     echo html_writer::tag('td', $jumlahjam);
     echo html_writer::tag('td', $beban_minggu);
-    echo html_writer::tag('td', $persen . '%');
+    echo html_writer::tag('td', $persen . '%', ['style' => $style]);
 
-    $url = new moodle_url('/local/jurnalmengajar/rekap_perguru.php', ['userid' => $userid, 'mingguke' => $mingguke]);
+    $url = new moodle_url('/local/jurnalmengajar/rekap_perguru.php', [
+        'userid' => $userid,
+        'mingguke' => $mingguke
+    ]);
+
     echo html_writer::tag('td', html_writer::link($url, '🔍 Lihat Detail'));
     echo html_writer::end_tag('tr');
 }
 
 echo html_writer::end_tag('tbody');
 echo html_writer::end_tag('table');
-echo html_writer::end_div(); // end wrapper
+echo html_writer::end_div();
 
 echo $OUTPUT->footer();

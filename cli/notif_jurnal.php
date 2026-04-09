@@ -125,6 +125,15 @@ $pending = [];
 
 foreach ($jadwal as $j) {
 
+    // 🔥 FILTER CUT OFF KELAS XII
+    $cutoff = jurnalmengajar_get_cutoff_xii(time());
+
+    if ($cutoff && time() >= $cutoff) {
+        if (preg_match('/\bXII\b/i', $j['kelas'])) {
+            continue; // ❗ SKIP notif kelas XII
+        }
+    }
+
     if (!in_array((int)$j['jamke'], $jam_terlewat)) continue;
     $key = $j['userid'] . '-' . $j['kelas'] . '-' . (int)$j['jamke'];
 if (isset($filled[$key])) continue;
