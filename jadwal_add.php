@@ -7,6 +7,10 @@ $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
 global $DB, $PAGE, $OUTPUT;
+$selected_userid = 0;
+$selected_hari   = '';
+$selected_kelas  = '';
+$selected_jamke  = '';
 
 // Ambil daftar guru dari role gurujurnal
 $sqlguru = "SELECT DISTINCT u.id, u.firstname, u.lastname
@@ -34,31 +38,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kelas  = required_param('kelas', PARAM_TEXT);
     $jamke  = required_param('jamke', PARAM_TEXT);
 
+$kelas = trim($kelas);
+$jamke = trim($jamke);
+
+if ($kelas === '' || $jamke === '') {
+    echo $OUTPUT->notification('Kelas dan jam wajib diisi', 'notifyproblem');
+} else {
     // simpan untuk ditampilkan kembali
     $selected_userid = $userid;
     $selected_hari   = $hari;
     $selected_kelas  = $kelas;
     $selected_jamke  = $jamke;
 
-    $jamarray = explode(',', $jamke);
+    $jamarray = array_unique(array_map('trim', explode(',', $jamke)));
 
-    foreach ($jamarray as $jam) {
-        $jam = (int) trim($jam);
-        if ($jam <= 0) continue;
+foreach ($jamarray as $jam) {
+    $jam = (int) trim($jam);
+    if ($jam <= 0) continue;
 
-        $record = new stdClass();
-        $record->userid = $userid;
-        $record->hari = $hari;
-        $record->kelas = $kelas;
-        $record->jamke = $jam;
-        $record->timecreated = time();
+    // cek dulu apakah sudah ada
+    $exists = $DB->record_exists('local_jurnalmengajar_jadwal', [
+        'userid' => $userid,
+        'hari'   => $hari,
+        'kelas'  => $kelas,
+        'jamke'  => $jam
+    ]);
 
-        $DB->insert_record('local_jurnalmengajar_jadwal', $record);
+    if ($exists) {
+        continue;
     }
+
+    // baru insert
+    $record = new stdClass();
+    $record->userid = $userid;
+    $record->hari = $hari;
+    $record->kelas = $kelas;
+    $record->jamke = $jam;
+    $record->timecreated = time();
+
+    $DB->insert_record('local_jurnalmengajar_jadwal', $record);
+}
 
     echo $OUTPUT->notification('Jadwal berhasil ditambahkan', 'notifysuccess');
 }
-
+}
 // Tampilan
 $PAGE->set_context($context);
 $PAGE->set_url('/local/jurnalmengajar/jadwal_add.php');
@@ -83,17 +106,17 @@ echo "<tr><td>Hari</td><td>";
 echo "<select name='hari'>";
 foreach ($hari_list as $h) {
     $selected = ($h == $selected_hari) ? "selected" : "";
-    echo "<option value='$h' $selected>$h</option>";
+    echo "<option value='".s($h)."' $selected>".s($h)."</option>";
 }
 echo "</select>";
 echo "</td></tr>";
 
 echo "<tr><td>Kelas</td><td>
-<input type='text' name='kelas'>
+<input type='text' name='kelas' value='".s($selected_kelas)."'>
 </td></tr>";
 
 echo "<tr><td>Jam (pisahkan koma)</td><td>
-<input type='text' name='jamke'>
+<input type='text' name='jamke' value='".s($selected_jamke)."'>
 Contoh: 1,2,3
 </td></tr>";
 
