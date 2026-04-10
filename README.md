@@ -5,7 +5,7 @@ Plugin Moodle untuk administrasi sekolah.
 ## Fitur Utama
 
 ### 1. Input E-Jurnal KBM
-Guru pilih kelas, input jam pelajaran ke (sesuai jam masuk), pilih mata pelajaran, input materi pembelajaran, input aktivitas KBM, pilih Murid tidak hadir - dan beri pilihan sakit, ijin, alpa atau dispensasi dan input keterangan tambahan (misal murid A tidur atau apapun kejadian di kelas). Guru klik Simpan Jurnal: Jurnal tersimpan di database sistem dan notif wa terkirim ke Wali Kelasnya dan guru sendiri.
+Guru pilih kelas, input jam pelajaran ke (sesuai jam masuk), pilih mata pelajaran, input materi pembelajaran, input aktivitas KBM, pilih Murid tidak hadir - dan beri pilihan sakit, ijin, alpa atau dispensasi dan input keterangan tambahan (misal murid A tidur atau apapun kejadian di kelas). **Guru klik Simpan Jurnal: Jurnal tersimpan di database sistem dan notif wa terkirim ke Wali Kelasnya dan guru sendiri**.
 
 Jurnal mengajar tersimpan di sistem bisa diakses melalui tombol Riwayat Jurnal. Setiap bulan, riwayat jurnal mengajar ini bisa diekspor ke format xlsx, untuk ditandatangi kepsek sebagai laporan.
 
@@ -36,7 +36,7 @@ Menampilkan data semua guru yang mengajar pada minggu ini (atau pada minggu tert
 Menampilkan data aktivitas semua guru yang mengajar pada kelas yang dipilih, mulai hari pertama sekolah sampai hari terakhir sekolah setiap minggunya.
 
 ### 10. Jurnal Guru wali
-Guru memilih siapa murid yang dibina sesuai pembagian murid binaan. Guru sebagai guru wali input jurnal guru wali, terdiri dari isian topik pembinaan/pertemuan, tindaklanjutnya dan keterangan. Ketika jurnal disimpan, notif wa terkirim ke wali kelas murid yang bersangkutan.
+Guru memilih siapa murid yang dibina sesuai pembagian murid binaan. Guru sebagai guru wali input jurnal guru wali, terdiri dari isian topik pembinaan/pertemuan, tindaklanjutnya dan keterangan. **Ketika jurnal disimpan, notif wa terkirim ke wali kelas murid yang bersangkutan.**
 
 
 ### 11. Data Murid Binaan Guru Wali
@@ -53,7 +53,7 @@ Guru yang bersangkutan pilih mata pelajaran, pilih kelas, tentukan tanggal, isi 
 Menampilkan data nilai yang diberikan pada murid kelas yang sudah diisi nilai hariannya, ada nilai rata-rata. 
 
 ### 15. Input Izin Murid (Masuk, Keluar atau Pulang)
-Guru piket dapat input Surat Izin untuk murid: Murid datang terlambat mau masuk kelas harus ada surat izin masuk; Murid mau keluar sekolah untuk suatu keperluan misalnya ke puskesmas harus ada surat izin keluar, atau murid mau pulang untuk suatu keperluan harus ada surat izin pulang. Setelah Guru piket menekan tombol cetak surat atau simpan, data tersimpan di database sistem dan notif wa terkirim ke wali kelas dari murid yang bersangkutan.
+Guru piket dapat input Surat Izin untuk murid: Murid datang terlambat mau masuk kelas harus ada surat izin masuk; Murid mau keluar sekolah untuk suatu keperluan misalnya ke puskesmas harus ada surat izin keluar, atau murid mau pulang untuk suatu keperluan harus ada surat izin pulang. **Setelah Guru piket menekan tombol cetak surat atau simpan, data tersimpan di database sistem dan notif wa terkirim ke wali kelas dari murid yang bersangkutan.**
 
 ### 16. Rekap Surat Izin Murid
 Semua surat izin murid ada rekapitulasinya, bisa dipilih kelas, bisa dipilih murid tertentu, dari tanggal tertentu sampai tanggal tertentu.
@@ -61,10 +61,14 @@ Semua surat izin murid ada rekapitulasinya, bisa dipilih kelas, bisa dipilih mur
 ### 17. Cetak Banyak Surat Izin
 Kadangkala banyak murid meminta surat izin, Guru Piket input dan simpan dahulu lalu bisa melakukan pencetakan surat izin banyak sekaligus, bukan satu satu surat dicetak.
 
-### 17. Pengawas Harian
-### 17. Pengawas Harian
-### 17. Pengawas Harian
-### 17. Pengawas Harian
+### 18. Layanan Guru BK
+Guru BK dapat meninput layanan yang sudah dilakukan, baik layanan individu, kelompok atau klasikal. **Ketika tombol simpan ditekan, data layanan tersimpan di database sistem dan notif wa terkirim ke wali kelas dari murid yang diberikan layanan**. Tersedia ekspor ke xlsx untuk layanan bulan yang dipilih.
+
+### 19. Pembinaan Guru BK
+Guru BK dapat meninput pembinaan yang sudah dilakukan untuk murid tertentu. **Ketika tombol simpan ditekan, data pembinaan tersimpan di database sistem dan notif wa terkirim ke wali kelas dari murid yang diberikan pembinaan**. Tersedia ekspor ke xlsx untuk data pembinaan bulan yang dipilih.
+
+### 20. Pengawas Harian
+### 21. Pengawas Harian
 
 
 * Notifikasi otomatis saat jurnal diinput
