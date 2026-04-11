@@ -24,8 +24,8 @@ $dari_raw   = optional_param('dari', '', PARAM_RAW);
 $sampai_raw = optional_param('sampai', '', PARAM_RAW);
 $mode       = optional_param('mode', 'hari', PARAM_ALPHA);
 
-$dari   = $dari_raw ? strtotime($dari_raw) : 0;
-$sampai = $sampai_raw ? (strtotime($sampai_raw) + 86399) : 0;
+$dari   = $dari_raw ? strtotime($dari_raw . ' 00:00:00') : 0;
+$sampai = $sampai_raw ? strtotime($sampai_raw . ' 23:59:59') : 0;
 
 /* ==========================
  * HELPER
