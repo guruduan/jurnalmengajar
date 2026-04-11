@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
 require_login();
+require_once($CFG->dirroot.'/local/jurnalmengajar/lib.php');
 
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:view', $context);
@@ -22,7 +23,10 @@ $mingguoptions = [];
 for ($i = 0; $i < 20; $i++) {
     $start = strtotime($tanggalawalminggu . " +{$i} week");
     $end   = strtotime("+6 day", $start);
-    $label = 'Minggu ' . ($i+1) . ' (' . date('d M Y', $start) . ' s/d ' . date('d M Y', $end) . ')';
+    $label = 'Minggu ' . ($i+1) . ' (' 
+    . tanggal_indo($start, 'tanggal') 
+    . ' s/d ' 
+    . tanggal_indo($end, 'tanggal') . ')';
     $mingguoptions[$i+1] = $label;
 }
 
@@ -34,7 +38,7 @@ foreach ($kelasrecords as $k) {
 }
 
 // === Hitung minggu berjalan (default) ===
-$hariini = strtotime('today');
+$hariini = strtotime(date('Y-m-d'));
 $diff = floor(($hariini - strtotime($tanggalawalminggu)) / (7 * 24 * 60 * 60));
 $minggu_berjalan = ($diff >= 0 && $diff < 20) ? $diff + 1 : 1;
 
@@ -93,6 +97,16 @@ $hari = [
     'Thursday'  => 'Kamis',
     'Friday'    => 'Jumat'
 ];
+$userids = array_unique(array_column($jurnalrecords, 'userid'));
+$users = [];
+
+if (!empty($userids)) {
+    list($in_sql, $paramsin) = $DB->get_in_or_equal($userids);
+    $users = $DB->get_records_sql(
+        "SELECT id, lastname FROM {user} WHERE id $in_sql",
+        $paramsin
+    );
+}
 
 foreach ($hari as $eng => $indo) {
     $rows = [];
@@ -100,10 +114,11 @@ foreach ($hari as $eng => $indo) {
     foreach ($jurnalrecords as $r) {
         $haridata = date('l', $r->timecreated);
         if ($haridata == $eng) {
-            $tanggalhari = date('d-m-Y', $r->timecreated);
+            $tanggalhari = tanggal_indo($r->timecreated, 'tanggal');
 
             // --- Ambil lastname pengajar ---
-            $lastname = $DB->get_field('user', 'lastname', ['id' => $r->userid]);
+            $lastname = $users[$r->userid]->lastname ?? '-';
+            $lastname = ucwords(strtolower($lastname));
 
             $rows[] = [
                 $r->jamke,
@@ -111,12 +126,12 @@ foreach ($hari as $eng => $indo) {
                 $lastname,
                 format_text($r->materi),
                 // format_text($r->keterangan),  // kolom keterangan dihapus
-                date('d-m-Y H:i', $r->timecreated)
+                tanggal_indo($r->timecreated, 'jam')
             ];
         }
     }
 
-    echo html_writer::tag('h3', $indo . ($tanggalhari ? ", tanggal $tanggalhari" : ''));
+    echo html_writer::tag('h3', $indo . ($tanggalhari ? " (" . $tanggalhari . ")" : ''));
     if (empty($rows)) {
         echo html_writer::tag('p', 'Tidak ada data.');
     } else {
