@@ -39,20 +39,8 @@ $mode        = optional_param('mode', 'hari', PARAM_ALPHA); // 'hari' | 'jam'  â
 $onlymine    = optional_param('onlymine', 0, PARAM_BOOL);
 $matpel      = optional_param('matpel', '', PARAM_TEXT);
 
-$dari   = $dari_raw   ? strtotime($dari_raw) : 0;
-$sampai = $sampai_raw ? (strtotime($sampai_raw) + 86399) : 0;
-
-// Fungsi format tanggal Indonesia
-function format_tanggal_indo($timestamp) {
-    $bulan = [
-        1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-    $tgl = date('j', $timestamp);
-    $bln = $bulan[(int)date('n', $timestamp)];
-    $thn = date('Y', $timestamp);
-    return "{$tgl} {$bln} {$thn}";
-}
+$dari   = $dari_raw   ? strtotime($dari_raw . ' 00:00:00') : 0;
+$sampai = $sampai_raw ? strtotime($sampai_raw . ' 23:59:59') : 0;
 
 // Normalisasi status
 function normalize_status($s) {
@@ -182,7 +170,10 @@ echo html_writer::end_tag('form');
 
 // ===== Ringkasan filter =====
 if ($dari && $sampai) {
-    echo '<p><strong>Rentang Tanggal:</strong> ' . format_tanggal_indo($dari) . ' sampai ' . format_tanggal_indo($sampai) . '</p>';
+    echo '<p><strong>Rentang Tanggal:</strong> ' 
+    . tanggal_indo($dari, 'tanggal') 
+    . ' sampai ' 
+    . tanggal_indo($sampai, 'tanggal') . '</p>';
 }
 echo '<p><strong>Mode:</strong> ' . ($mode === 'hari' ? 'Per Hari' : 'Per Jam') . '</p>';
 if ($onlymine || $matpel !== '') {
