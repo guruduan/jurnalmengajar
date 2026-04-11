@@ -1,6 +1,7 @@
 <?php
 require_once('../../config.php');
 require_once($CFG->libdir . '/pdflib.php');
+require_once($CFG->dirroot . '/local/jurnalmengajar/lib.php');
 
 require_login();
 $context = context_system::instance();
@@ -64,9 +65,6 @@ if (empty($ids)) {
     );
 }
 
-// Formatter tanggal Indonesia (zona WITA)
-$fmt = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Makassar', null, 'EEEE, dd MMMM yyyy');
-
 // Ambil fieldid NIP sekali saja
 $fieldid_nip = $DB->get_field('user_info_field', 'id', ['shortname' => 'nip']);
 $nip_for = function (int $userid) use ($DB, $fieldid_nip): string {
@@ -80,8 +78,7 @@ $nip_for = function (int $userid) use ($DB, $fieldid_nip): string {
 // ==========================
 // TANGGAL UNTUK JUDUL & NAMA FILE
 // ==========================
-$bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-$tanggal = date('j') . ' ' . $bulan[date('n')-1] . ' ' . date('Y');
+$tanggal = tanggal_indo(time(), 'tanggal');
 
 // Siapkan PDF (TCPDF via moodlelib)
 $pdf = new pdf();
@@ -111,22 +108,28 @@ foreach ($files as $file) {
 //
 
 // Fungsi render satu surat (1 halaman)
-$render_surat = function (pdf $pdf, stdClass $record) use ($DB, $fmt, $nip_for, $stempel_path, $sekolah, $tempat) {
+$render_surat = function (pdf $pdf, stdClass $record) use ($DB, $nip_for, $stempel_path, $sekolah, $tempat) {
     // Lookup entitas terkait (gunakan IGNORE_MISSING untuk aman)
     $siswa     = $DB->get_record('user',   ['id' => $record->userid],        'id, lastname', IGNORE_MISSING);
     $kelas     = $DB->get_record('cohort', ['id' => $record->kelasid],       'id, name',     IGNORE_MISSING);
     $penginput = $DB->get_record('user',   ['id' => $record->penginput],     'id, lastname', IGNORE_MISSING);
     $guru      = $DB->get_record('user',   ['id' => $record->guru_pengajar], 'id, lastname', IGNORE_MISSING);
 
-    $nama_siswa = $siswa->lastname ?? '-';
-    $nama_kelas = $kelas->name     ?? '-';
-    $nama_peng  = $penginput->lastname ?? '-';
-    $nama_guru  = $guru->lastname  ?? '-';
+$namasiswa = isset($siswa->lastname)
+    ? ucwords(strtolower($siswa->lastname))
+    : '-';
+
+$namakelas = $kelas->name ?? '-';
+$namaguru  = $guru->lastname ?? '-';
+$namapeng  = $penginput->lastname ?? '-';
+
+$alasan    = $record->alasan ?? '-';
+$keperluan = $record->keperluan ?? '-';
 
     $nip_guru = !empty($guru->id) ? $nip_for($guru->id) : '';
     $nip_peng = !empty($penginput->id) ? $nip_for($penginput->id) : '';
 
-    $tanggal = $fmt->format($record->timecreated);
+    $tanggal = tanggal_indo($record->timecreated, 'judul');
 
     $pdf->AddPage();
     $pdf->SetFont('helvetica', '', 10);
@@ -141,10 +144,10 @@ SURAT IZIN KELUAR/MASUK MURID<br>
 <br><br>
 
 <table>
-<tr><td width="120">Nama</td><td>: {$siswa->lastname}</td></tr>
-<tr><td>Kelas</td><td>: {$kelas->name}</td></tr>
-<tr><td>Alasan</td><td>: {$record->alasan}</td></tr>
-<tr><td>Keperluan</td><td>: {$record->keperluan}</td></tr>
+<tr><td width="120">Nama</td><td>: {$namasiswa}</td></tr>
+<tr><td>Kelas</td><td>: {$namakelas}</td></tr>
+<tr><td>Alasan</td><td>: {$alasan}</td></tr>
+<tr><td>Keperluan</td><td>: {$keperluan}</td></tr>
 </table>
 
 <br><br>
@@ -160,8 +163,8 @@ SURAT IZIN KELUAR/MASUK MURID<br>
 </tr>
 <tr><td colspan="2"><br><br><br></td></tr>
 <tr>
-    <td><u>{$guru->lastname}</u></td>
-    <td><u>{$penginput->lastname}</u></td>
+    <td><u>{$namaguru}</u></td>
+    <td><u>{$namapeng}</u></td>
 </tr>
 <tr>
     <td>NIP: {$nip_guru}</td>

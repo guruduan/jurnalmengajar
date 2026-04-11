@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../../config.php');
 require_login();
 require_once($CFG->libdir . '/pdflib.php');
+require_once($CFG->dirroot . '/local/jurnalmengajar/lib.php');
 
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:view', $context);
@@ -16,8 +17,8 @@ $mode      = optional_param('mode', 'jam', PARAM_ALPHA); // 'jam' | 'hari'
 $onlymine  = optional_param('onlymine', 0, PARAM_BOOL);
 $matpel    = optional_param('matpel', '', PARAM_TEXT);
 
-$dari   = strtotime($dariRaw);
-$sampai = strtotime($sampaiRaw) + 86399;
+$dari = strtotime($dariRaw) ?: time();
+$sampai = (strtotime($sampaiRaw) ?: time()) + 86399;
 
 // ===== Data kelas & siswa =====
 $kelas = $DB->get_record('cohort', ['id' => $kelasid], 'name');
@@ -25,11 +26,8 @@ $siswa = $DB->get_record('user', ['id' => $siswaid], 'firstname, lastname');
 if (!$kelas || !$siswa) {
     print_error('Data tidak ditemukan');
 }
-$namakelas  = format_string($kelas->name);
+$namakelas = $kelas->name;
 $namasiswa  = ucwords(strtolower($siswa->lastname));
-
-// ===== Formatter tanggal Indonesia (WITA) =====
-$fmt = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Makassar');
 
 // ===== Util: normalisasi & prioritas (selaras halaman) =====
 function normalize_status($s) {
@@ -83,7 +81,10 @@ $pdf->SetFont('helvetica', '', 10);
 $html  = "<h3>Rekap Ketidakhadiran Murid</h3>";
 $html .= "<p><strong>Nama:</strong> {$namasiswa}<br>";
 $html .= "<strong>Kelas:</strong> {$namakelas}<br>";
-$html .= "<strong>Rentang:</strong> " . date('d M Y', $dari) . " - " . date('d M Y', $sampai) . "<br>";
+$html .= "<strong>Rentang:</strong> " 
+    . tanggal_indo($dari, 'judul') 
+    . " - " 
+    . tanggal_indo($sampai, 'judul') . "<br>";
 $html .= "<strong>Mode:</strong> " . ($mode === 'hari' ? 'Per Hari (unik)' : 'Per Jam (jamke)');
 
 $filters = [];
@@ -101,7 +102,8 @@ if ($mode === 'hari') {
     $per_tanggal = []; // 'Y-m-d' => ['status'=>..., 'rincian'=>[[jamke,mapel,guru], ...]]
     foreach ($jurnals as $j) {
         $tglKey = date('Y-m-d', $j->timecreated);
-        $absen  = json_decode($j->absen, true) ?? [];
+        $absen = json_decode($j->absen, true);
+if (!is_array($absen)) $absen = [];
         $statusJurnal = null;
         foreach ($absen as $nama => $als) {
             if (strcasecmp(trim($nama), trim($siswa->lastname)) == 0) {
@@ -147,7 +149,7 @@ if ($mode === 'hari') {
     $no = 1;
     $hari_tidak_hadir = 0;
     foreach ($per_tanggal as $tglKey => $info) {
-        $tanggal = $fmt->format(strtotime($tglKey));
+        $tanggal = tanggal_indo(strtotime($tglKey), 'judul');
         $st = $info['status'];
         if ($st !== 'hadir') { $hari_tidak_hadir++; }
 
@@ -191,7 +193,8 @@ if ($mode === 'hari') {
     $totaljam = 0;
 
     foreach ($jurnals as $j) {
-        $absen = json_decode($j->absen, true) ?? [];
+        $absen = json_decode($j->absen, true);
+if (!is_array($absen)) $absen = [];
         $alasan = null;
         foreach ($absen as $nama => $als) {
             if (strcasecmp(trim($nama), trim($siswa->lastname)) == 0) {
@@ -202,7 +205,7 @@ if ($mode === 'hari') {
 
         // tampilkan hanya jika tidak 'hadir'
         if ($alasan && $alasan !== 'hadir') {
-            $tanggal = $fmt->format($j->timecreated);
+            $tanggal = tanggal_indo($j->timecreated, 'judul');
             $jamke   = $j->jamke ?? '-';
             $matpelj = $j->matapelajaran ?? '-';
 

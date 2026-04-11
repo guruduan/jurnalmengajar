@@ -1,3 +1,4 @@
+# cat /var/www/html/moodle/local/jurnalmengajar/cetak_surat_izin.php
 <?php
 
 require_once('../../config.php');
@@ -22,36 +23,36 @@ $guru = $DB->get_record('user', ['id' => $data->guru_pengajar], 'id, lastname');
 $sekolah = get_config('local_jurnalmengajar', 'nama_sekolah');
 $tempat  = get_config('local_jurnalmengajar', 'tempat_ttd');
 
-// Ambil NIP
+// Ambil NIP (aman jika field belum ada)
 $fieldid_nip = $DB->get_field('user_info_field', 'id', ['shortname' => 'nip']);
 
-$nip_guru = $DB->get_field('user_info_data', 'data', [
-    'userid' => $guru->id,
-    'fieldid' => $fieldid_nip
-]);
+$nip_guru = '-';
+$nip_penginput = '-';
 
-$nip_penginput = $DB->get_field('user_info_data', 'data', [
-    'userid' => $penginput->id,
-    'fieldid' => $fieldid_nip
-]);
+if ($fieldid_nip) {
+    $nip_guru = $DB->get_field('user_info_data', 'data', [
+        'userid' => $guru->id,
+        'fieldid' => $fieldid_nip
+    ]) ?: '-';
 
-// Format tanggal Indonesia
-$fmt = new IntlDateFormatter(
-    'id_ID',
-    IntlDateFormatter::FULL,
-    IntlDateFormatter::NONE,
-    'Asia/Makassar',
-    null,
-    'EEEE, dd MMMM yyyy'
-);
+    $nip_penginput = $DB->get_field('user_info_data', 'data', [
+        'userid' => $penginput->id,
+        'fieldid' => $fieldid_nip
+    ]) ?: '-';
+}
 
-$tanggal = $fmt->format($data->timecreated);
+$tanggal = tanggal_indo($data->timecreated, 'judul');
 
 // ==========================
-// TANGGAL UNTUK NAMA FILE
+// UNTUK FILE PDF
 // ==========================
-$bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-$tanggalfile = date('j') . ' ' . $bulan[date('n')-1] . ' ' . date('Y');
+$tanggalfile = tanggal_indo($data->timecreated, 'tanggal');
+$alasan = htmlspecialchars($data->alasan);
+$keperluan = htmlspecialchars($data->keperluan);
+$namasiswa = htmlspecialchars($siswa->lastname);
+$namaguru  = htmlspecialchars($guru->lastname);
+$namapenginput = htmlspecialchars($penginput->lastname);
+$namakelas = htmlspecialchars($kelas->name);
 
 // ==========================
 // SIAPKAN PDF
@@ -77,10 +78,10 @@ SURAT IZIN KELUAR/MASUK MURID<br>
 <br><br>
 
 <table>
-<tr><td width="120">Nama</td><td>: {$siswa->lastname}</td></tr>
-<tr><td>Kelas</td><td>: {$kelas->name}</td></tr>
-<tr><td>Alasan</td><td>: {$data->alasan}</td></tr>
-<tr><td>Keperluan</td><td>: {$data->keperluan}</td></tr>
+<tr><td width="120">Nama</td><td>: {$namasiswa}</td></tr>
+<tr><td>Kelas</td><td>: {$namakelas}</td></tr>
+<tr><td>Alasan</td><td>: {$alasan}</td></tr>
+<tr><td>Keperluan</td><td>: {$keperluan}</td></tr>
 </table>
 
 <br><br>
@@ -96,12 +97,12 @@ SURAT IZIN KELUAR/MASUK MURID<br>
 </tr>
 <tr><td colspan="2"><br><br><br></td></tr>
 <tr>
-    <td><u>{$guru->lastname}</u></td>
-    <td><u>{$penginput->lastname}</u></td>
+    <td><u>{$namaguru}</u></td>
+    <td><u>{$namapenginput}</u></td>
 </tr>
 <tr>
-    <td>NIP: {$nip_guru}</td>
-    <td>NIP: {$nip_penginput}</td>
+    <td>NIP {$nip_guru}</td>
+    <td>NIP {$nip_penginput}</td>
 </tr>
 </table>
 HTML;
@@ -119,9 +120,16 @@ $pdf->writeHTML($htmloutput);
 
 // Ambil stempel dari settings
 $stempel_path = jurnalmengajar_get_stempel_path();
+
+// Tambahkan stempel setelah HTML
 if (!empty($stempel_path) && file_exists($stempel_path)) {
+    // Posisi stempel (atur sesuai kebutuhan)
     $pdf->Image($stempel_path, 70, 42, 38, 38, 'PNG');
 }
 
 // Output PDF
-$pdf->Output('surat_izin-' . $tanggalfile . '.pdf', 'I');
+if (ob_get_length()) {
+    ob_clean();
+}
+$namafile = 'surat_izin_' . str_replace(' ', '_', $tanggalfile) . '.pdf';
+$pdf->Output($namafile, 'I');

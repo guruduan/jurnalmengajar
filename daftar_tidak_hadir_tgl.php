@@ -1,4 +1,3 @@
-
 <?php
 
 require(__DIR__ . '/../../config.php');
@@ -13,19 +12,17 @@ $PAGE->set_title('Daftar murid tidak hadir per tanggal');
 $PAGE->set_heading('Daftar murid tidak hadir per tanggal');
 
 // ==========================
-// Ambil tanggal dari parameter GET (WITA)
+// Ambil tanggal
 // ==========================
-$tz = new DateTimeZone('Asia/Makassar');
-$param_tanggal = optional_param('tanggal', date('Y-m-d'), PARAM_RAW_TRIMMED);
+$param_tanggal = optional_param('tanggal', date('Y-m-d'), PARAM_TEXT);
 
-try {
-    $selected = new DateTime($param_tanggal, $tz);
-} catch (Exception $e) {
-    $selected = new DateTime('now', $tz);
+$timestamp = strtotime($param_tanggal . ' 00:00:00');
+if (!$timestamp) {
+    $timestamp = time();
 }
-$start = (clone $selected)->setTime(0, 0, 0)->getTimestamp();
-$end   = (clone $selected)->setTime(23, 59, 59)->getTimestamp();
 
+$start = strtotime(date('Y-m-d', $timestamp) . ' 00:00:00');
+$end   = strtotime(date('Y-m-d', $timestamp) . ' 23:59:59');
 global $DB;
 
 // ==========================
@@ -150,7 +147,7 @@ echo html_writer::empty_tag('input', [
     'type'  => 'date',
     'id'    => 'id_tanggal',
     'name'  => 'tanggal',
-    'value' => $selected->format('Y-m-d'),
+    'value' => date('Y-m-d', $timestamp),
     'class' => 'form-control w-auto'
 ]);
 
@@ -267,7 +264,7 @@ usort($rows, function($a, $b) {
 // Header tanggal
 echo html_writer::tag(
     'p',
-    html_writer::tag('strong', 'Hari/Tanggal: ') . tanggal_indo($selected->getTimestamp(), 'judul'),
+    html_writer::tag('strong', 'Hari/Tanggal: ') . tanggal_indo($timestamp, 'judul'),
     ['class' => 'mb-3']
 );
 
@@ -287,11 +284,11 @@ $no = 1;
 foreach ($rows as $r) {
     $table->data[] = [
         $no++,
-        format_string($r->kelas),
-        format_string($r->lastname),
-        format_string($r->absen),
-        format_string($r->jamke === '' ? '-' : $r->jamke),
-        format_string(tanggal_indo($r->timeinput, 'jam')),
+        $r->kelas,
+        $r->lastname,
+        $r->absen,
+        $r->jamke === '' ? '-' : $r->jamke,
+        tanggal_indo($r->timeinput, 'jam'),
     ];
 }
 

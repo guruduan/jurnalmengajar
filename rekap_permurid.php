@@ -1,9 +1,11 @@
 <?php
 require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/jurnalmengajar/lib.php');
 require_login();
 
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:view', $context);
+global $DB, $PAGE, $OUTPUT;
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/jurnalmengajar/rekap_permurid.php'));
@@ -17,21 +19,12 @@ $mode        = optional_param('mode', 'jam', PARAM_ALPHA); // 'jam' | 'hari'
 $onlymine    = optional_param('onlymine', 0, PARAM_BOOL);
 $matpel      = optional_param('matpel', '', PARAM_TEXT);
 
-$dari   = strtotime($dariParam);
-$sampai = strtotime($sampaiParam) + 86399;
-
-// Formatter tanggal Indonesia (WITA)
-$fmt = new IntlDateFormatter(
-    'id_ID',
-    IntlDateFormatter::FULL,   // ← ini yang bikin ada hari
-    IntlDateFormatter::NONE,
-    'Asia/Makassar'
-);
-
+$dari = strtotime($dariParam) ?: time();
+$sampai = (strtotime($sampaiParam) ?: time()) + 86399;
 
 // Ambil nama kelas
 $kelas = $DB->get_record('cohort', ['id' => $kelasid], 'id, name');
-$namakelas = $kelas ? format_string($kelas->name) : '(kelas tidak ditemukan)';
+$namakelas = $kelas ? $kelas->name : '(kelas tidak ditemukan)';
 
 $PAGE->set_title("Rekap Kehadiran Murid [$namakelas]");
 $PAGE->set_heading("Rekap Kehadiran Murid [$namakelas]");
@@ -114,7 +107,7 @@ $namasiswa = ucwords(strtolower($siswa->lastname));
 
 // Info siswa & rentang + mode + filter
 echo html_writer::tag('h3', "Siswa: {$namasiswa}");
-$rentangTanggal = $fmt->format($dari) . ' sampai ' . $fmt->format($sampai);
+$rentangTanggal = tanggal_indo($dari, 'judul') . ' sampai ' . tanggal_indo($sampai, 'judul');
 echo html_writer::tag('p', "Rentang Tanggal: $rentangTanggal", ['class' => 'mb-1 fw-bold']);
 $badges = ["Mode: " . ($mode === 'hari' ? 'Per Hari' : 'Per Jam (jamke)')];
 if ($onlymine) { $badges[] = 'Hanya jurnal saya'; }
@@ -151,7 +144,8 @@ if ($mode === 'hari') {
     $per_tanggal = [];   // 'Y-m-d' => ['status' => ..., 'rincian' => [..]]
     foreach ($jurnals as $j) {
         $tglKey = date('Y-m-d', $j->timecreated);
-        $absen  = json_decode($j->absen, true) ?? [];
+        $absen = json_decode($j->absen, true);
+if (!is_array($absen)) $absen = [];
         $statusJurnal = null;
 
         foreach ($absen as $nama => $als) {
@@ -228,7 +222,7 @@ unset($info);
     $no = 1;
     $hari_tidak_hadir = 0;
     foreach ($per_tanggal as $tglKey => $info) {
-        $tanggalDisplay = $fmt->format(strtotime($tglKey));
+        $tanggalDisplay = tanggal_indo(strtotime($tglKey), 'judul');
         $st = $info['status'];
 
         if ($st !== 'hadir') { $hari_tidak_hadir++; }
@@ -266,8 +260,9 @@ unset($info);
     $totaljam = 0;
 
     foreach ($jurnals as $jurnal) {
-        $tanggal = $fmt->format($jurnal->timecreated);
-        $absen = json_decode($jurnal->absen, true) ?? [];
+        $tanggal = tanggal_indo($jurnal->timecreated, 'judul');
+        $absen = json_decode($jurnal->absen, true);
+if (!is_array($absen)) $absen = [];
         $jamke = $jurnal->jamke ?? '-';
         $matpelj = $jurnal->matapelajaran ?? '-';
 
