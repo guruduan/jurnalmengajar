@@ -1,4 +1,4 @@
-# Sistem Informasi Murid Guru - Moodle Local Plugin
+# Sistem Informasi Manajemen di Sekolah
 
 Plugin Moodle untuk administrasi sekolah.
 
