@@ -198,10 +198,15 @@ function jurnalmengajar_cek_libur($tanggal) {
 /**
  * FUNGSI tanggal berhenti mengajar kelas XII
  */
-function jurnalmengajar_get_cutoff_xii($timestamp) {
+function jurnalmengajar_get_cutoff_xii($timestamp = null) {
     $config = get_config('local_jurnalmengajar', 'cutoff_xii');
 
     if (empty($config)) return null;
+
+    // kalau tidak dikirim, pakai waktu sekarang
+    if ($timestamp === null) {
+        $timestamp = time();
+    }
 
     $tahun = date('Y', $timestamp);
 
@@ -211,9 +216,8 @@ function jurnalmengajar_get_cutoff_xii($timestamp) {
         $line = trim($line);
         if ($line == '') continue;
 
-        // validasi format YYYY-MM-DD
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $line)) {
-            continue; // skip kalau salah format
+            continue;
         }
 
         if (strpos($line, $tahun . '-') === 0) {

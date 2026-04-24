@@ -107,8 +107,8 @@ for ($i = 1; $i <= $minggu_berjalan; $i++) {
         : 0;
 
     // Rentang tanggal
-    $awal_ts = $awal->getTimestamp();
-$akhir_ts = $akhir->getTimestamp();
+$awal_ts = $start;
+$akhir_ts = $end;
 $awal_str = tanggal_indo($awal_ts, 'tglbulan');
 $akhir_str = tanggal_indo($akhir_ts, 'tanggal');
 
@@ -123,6 +123,16 @@ $rentang = $awal_str . ' - ' . $akhir_str;
     ];
 }
 
+// Cutoff tampilkan selalu
+$cutoff = jurnalmengajar_get_cutoff_xii();
+
+if ($cutoff) {
+    echo html_writer::div(
+        'Kelas XII tidak ada KBM sejak: ' . tanggal_indo($cutoff, 'tanggal') . 
+        ' (beban jam mengajar sudah disesuaikan)',
+        'alert alert-info'
+    );
+}
 // =====================
 // TABEL
 // =====================
@@ -147,9 +157,9 @@ foreach ($rekap_mingguan as $r) {
     if ($r['persen'] >= 80) {
         $style = 'color:green;font-weight:bold';
     } elseif ($r['jumlah'] == 0 && $r['beban'] > 0) {
-        $style = 'color:orange;font-weight:bold';
-    } elseif ($r['persen'] < 50) {
         $style = 'color:red;font-weight:bold';
+    } elseif ($r['persen'] < 50) {
+        $style = 'color:orange;font-weight:bold';
     }
 
     $url = new moodle_url('/local/jurnalmengajar/rekap_perguru.php', [

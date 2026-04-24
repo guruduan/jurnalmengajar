@@ -141,7 +141,7 @@ if ($cutoff) {
 
     if ($tanggal_akhir_minggu_ini >= $cutoff) {
         echo html_writer::div(
-            'Kelas XII tidak ada KBM sejak: ' . date('d M Y', $cutoff) . ' (beban jam mengajar sudah disesuaikan)',
+            'Kelas XII tidak ada KBM sejak: ' . tanggal_indo($cutoff, 'tanggal') . ' (beban jam mengajar sudah disesuaikan)',
             'alert alert-info'
         );
     }
