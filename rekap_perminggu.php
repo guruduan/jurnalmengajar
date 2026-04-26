@@ -134,24 +134,28 @@ uksort($rekap, function($a, $b) use ($all_users) {
     );
 });
 
-// Cutoff tambahkan di atas tabel
-$cutoff = jurnalmengajar_get_cutoff_xii($tanggal_awal_minggu_ini);
+// Daftar kelas
+$daftar_kelas = ['VI', 'IX', 'XII'];
 
-if ($cutoff) {
+$ada_yang_sudah_set = false;
 
-    if ($tanggal_akhir_minggu_ini >= $cutoff) {
-        echo html_writer::div(
-            'Kelas XII tidak ada KBM sejak: ' . tanggal_indo($cutoff, 'tanggal') . ' (beban jam mengajar sudah disesuaikan)',
-            'alert alert-info'
-        );
+foreach ($daftar_kelas as $kelas_level) {
+    $cutoff = jurnalmengajar_get_cutoff_by_kelas($kelas_level, $tanggal_awal_minggu_ini);
+
+    if ($cutoff) {
+        $ada_yang_sudah_set = true;
+        break; // cukup 1 saja
     }
+}
 
-} else {
+// 🔥 tampilkan warning jika BELUM ADA yang diset sama sekali
+if (!$ada_yang_sudah_set) {
     echo html_writer::div(
-        '⚠️ Cutoff kelas XII belum disetting',
+        '⚠️ Tanggal berhenti KBM di kelas VI atau IX, atau XII belum diatur di pengaturan awal.',
         'alert alert-warning'
     );
 }
+
 // Tabel
 echo html_writer::start_div('table-wrapper');
 echo html_writer::start_tag('table', ['class' => 'generaltable']);

@@ -122,21 +122,35 @@ foreach ($jadwal as $j) {
 
 // ===== Group jurnal yang belum diisi =====
 $pending = [];
-
+$cutoff_cache = [];
 foreach ($jadwal as $j) {
 
-    // 🔥 FILTER CUT OFF KELAS XII
-    $cutoff = jurnalmengajar_get_cutoff_xii(time());
+// 🔥 FILTER CUT OFF MULTI KELAS
+$kelas_level = null;
 
-    if ($cutoff && time() >= $cutoff) {
-        if (preg_match('/\bXII\b/i', $j['kelas'])) {
-            continue; // ❗ SKIP notif kelas XII
-        }
+// deteksi kelas (VI, IX, XII)
+if (preg_match('/\b(VI|IX|XII)\b/i', $j['kelas'], $match)) {
+    $kelas_level = strtoupper($match[1]);
+}
+
+if ($kelas_level) {
+
+    if (!isset($cutoff_cache[$kelas_level])) {
+        $cutoff_cache[$kelas_level] = jurnalmengajar_get_cutoff_by_kelas($kelas_level, $current);
     }
+
+    $cutoff = $cutoff_cache[$kelas_level];
+
+    if ($cutoff && $current >= $cutoff) {
+        continue;
+    }
+}
 
     if (!in_array((int)$j['jamke'], $jam_terlewat)) continue;
     $key = $j['userid'] . '-' . $j['kelas'] . '-' . (int)$j['jamke'];
-if (isset($filled[$key])) continue;
+if (isset($filled[$key])) {
+    continue;
+}
 
     if (!isset($pending[$j['userid']])) {
         $pending[$j['userid']] = [

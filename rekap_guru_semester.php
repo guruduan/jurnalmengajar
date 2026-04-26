@@ -123,16 +123,24 @@ $rentang = $awal_str . ' - ' . $akhir_str;
     ];
 }
 
-// Cutoff tampilkan selalu
-$cutoff = jurnalmengajar_get_cutoff_xii();
+// =====================
+// INFO CUT OFF (MULTI KELAS)
+// =====================
+$daftar_kelas = ['VI', 'IX', 'XII'];
 
-if ($cutoff) {
-    echo html_writer::div(
-        'Kelas XII tidak ada KBM sejak: ' . tanggal_indo($cutoff, 'tanggal') . 
-        ' (beban jam mengajar sudah disesuaikan)',
-        'alert alert-info'
-    );
+foreach ($daftar_kelas as $kelas_level) {
+
+    $cutoff = jurnalmengajar_get_cutoff_by_kelas($kelas_level);
+
+    if ($cutoff) {
+        echo html_writer::div(
+            "Kelas $kelas_level tidak ada KBM sejak: " . tanggal_indo($cutoff, 'tanggal') .
+            " (beban jam mengajar sudah disesuaikan)",
+            'alert alert-info'
+        );
+    }
 }
+
 // =====================
 // TABEL
 // =====================

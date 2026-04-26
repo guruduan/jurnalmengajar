@@ -196,14 +196,14 @@ function jurnalmengajar_cek_libur($tanggal) {
     return false;
 }
 /**
- * FUNGSI tanggal berhenti mengajar kelas XII
+ * Ambil cutoff berdasarkan kode kelas (VI, IX, XII)
  */
-function jurnalmengajar_get_cutoff_xii($timestamp = null) {
-    $config = get_config('local_jurnalmengajar', 'cutoff_xii');
+function jurnalmengajar_get_cutoff_by_kelas($kelas_target, $timestamp = null) {
+
+    $config = get_config('local_jurnalmengajar', 'cutoff_kelas');
 
     if (empty($config)) return null;
 
-    // kalau tidak dikirim, pakai waktu sekarang
     if ($timestamp === null) {
         $timestamp = time();
     }
@@ -216,12 +216,16 @@ function jurnalmengajar_get_cutoff_xii($timestamp = null) {
         $line = trim($line);
         if ($line == '') continue;
 
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $line)) {
+        // Format: XII|2026-04-06
+        if (!preg_match('/^([A-Z0-9]+)\|(\d{4}-\d{2}-\d{2})$/', $line, $m)) {
             continue;
         }
 
-        if (strpos($line, $tahun . '-') === 0) {
-            return strtotime($line);
+        $kelas = strtoupper($m[1]);
+        $tanggal = $m[2];
+
+        if ($kelas === strtoupper($kelas_target) && strpos($tanggal, $tahun . '-') === 0) {
+            return strtotime($tanggal);
         }
     }
 
@@ -370,44 +374,52 @@ function jurnalmengajar_get_beban_jam_guru_by_date($timestamp) {
     $jadwal = jurnalmengajar_get_jadwal_acuan();
     $beban = [];
 
-    // Validasi timestamp
     if (empty($timestamp) || !is_numeric($timestamp)) {
         $timestamp = time();
     }
 
-    // Ambil cutoff XII
-    $cutoff = jurnalmengajar_get_cutoff_xii($timestamp);
+    // 👉 TARUH DI SINI (sekali saja)
+    $cutoff_cache = [];
 
     foreach ($jadwal as $j) {
 
-        // Validasi userid
         if (empty($j['userid'])) {
             continue;
         }
 
         $userid = $j['userid'];
+        $kelas  = isset($j['kelas']) ? trim($j['kelas']) : '';
 
-        // Ambil & amankan kelas
-        $kelas = isset($j['kelas']) ? trim($j['kelas']) : '';
-
-        // 🔥 Filter kelas XII setelah cutoff
-        if (!empty($cutoff) && $timestamp >= $cutoff) {
-            if (!empty($kelas) && preg_match('/\bXII\b/i', $kelas)) {
-                continue;
-            }
+        // 🔍 Ambil level kelas
+        $kelas_level = null;
+        if (preg_match('/\b(VI|IX|XII)\b/i', $kelas, $match)) {
+            $kelas_level = strtoupper($match[1]);
         }
 
-        // Inisialisasi beban
+        // 🔥 GANTI bagian cutoff LAMA dengan ini
+        $cutoff = null;
+        if ($kelas_level) {
+            if (!isset($cutoff_cache[$kelas_level])) {
+                $cutoff_cache[$kelas_level] = jurnalmengajar_get_cutoff_by_kelas($kelas_level, $timestamp);
+            }
+            $cutoff = $cutoff_cache[$kelas_level];
+        }
+
+        // 🔥 Filter
+        if (!empty($cutoff) && $timestamp >= $cutoff) {
+            continue;
+        }
+
         if (!isset($beban[$userid])) {
             $beban[$userid] = 0;
         }
 
-        // Tambah beban
         $beban[$userid]++;
     }
 
     return $beban;
 }
+
 // ===============================
 // Ambil semua kelas (cohort)
 // ===============================

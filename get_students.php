@@ -33,8 +33,8 @@ $total = count($members);
 $setengah = ceil($total / 2);
 
 // Bagi ke 2 kolom
-$kolom1 = array_slice($members, 0, 18); // pakai 18 siswa pertama
-$kolom2 = array_slice($members, 18);    // sisanya
+$kolom1 = array_slice($members, 0, $setengah);
+$kolom2 = array_slice($members, $setengah);
 
 echo '<div><strong>Pilih siswa tidak hadir & pilih alasannya:</strong></div>';
 echo '<div style="margin-top: 10px;">';
@@ -68,7 +68,7 @@ echo '</div>';
 
 // Kolom 2
 echo '<div style="flex:1;">';
-tampilkan_siswa($kolom2, 18);
+tampilkan_siswa($kolom2, $setengah);
 echo '</div>';
 
 echo '</div>'; // end flex

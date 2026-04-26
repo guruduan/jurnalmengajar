@@ -143,16 +143,22 @@ Contoh:
 2026-03-23 s/d 2026-03-25',
     ''
 ));
+
 // ==============================
-// CUT OFF KELAS XII
+// CUT OFF MULTI KELAS
 // ==============================
 $settings->add(new admin_setting_configtextarea(
-    'local_jurnalmengajar/cutoff_xii',
-    'Tanggal Berhenti Kelas XII',
-    'Isi tanggal berhenti mengajar kelas XII format YYYY-MM-DD.
-Contoh:
-2026-04-06',
-    ''
+    'local_jurnalmengajar/cutoff_kelas',
+    'Tanggal Berhenti KBM di Kelas (VI, IX, XII)',
+    'Format: KELAS|YYYY-MM-DD (1 baris per data)<br>
+    Contoh:<br>
+    VI|2026-05-10<br>
+    IX|2026-05-05<br>
+    XII|2026-04-06',
+    '',
+    PARAM_TEXT,
+    50, // lebar (opsional)
+    3   // tinggi (INI YANG NGURANGIN BARIS)
 ));
 
     // =========================
