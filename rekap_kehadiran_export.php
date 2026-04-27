@@ -155,6 +155,14 @@ if ($mode === 'hari') {
     $unit_label = 'jam';
 }
 
+$config = get_config('local_jurnalmengajar');
+
+$nama_sekolah = $config->nama_sekolah ?? 'Nama Sekolah';
+$tahun_ajaran = $config->tahun_ajaran ?? '';
+$tempat       = $config->tempat_ttd ?? 'Tempat';
+$nama_kepsek  = $config->nama_kepsek ?? 'Nama Kepala Sekolah';
+$nip_kepsek   = $config->nip_kepsek ?? 'NIP';
+
 // ===== Spreadsheet =====
 $sheet = new Spreadsheet();
 $active = $sheet->getActiveSheet();
@@ -162,27 +170,31 @@ $active->setTitle("Rekap Kehadiran");
 
 // Judul
 $active->mergeCells("A1:H1");
-$active->setCellValue("A1", "Rekap Kehadiran Siswa");
-$active->getStyle("A1")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
-$active->getStyle("A1")->getFont()->setBold(true)->setSize(14);
+$active->setCellValue("A1", "Rekap Kehadiran Siswa - {$nama_sekolah}");
 
-// Info kelas dan tanggal
 $active->mergeCells("A2:H2");
 $active->setCellValue("A2", "Kelas: {$kelasnama}");
+
 $active->mergeCells("A3:H3");
-$active->setCellValue("A3", "Periode: " . date('d-m-Y', $dari) . " s.d. " . date('d-m-Y', $sampai));
+$active->setCellValue("A3", "Tahun Ajaran: {$tahun_ajaran}");
+
+$active->mergeCells("A4:H4");
+$active->setCellValue("A4", "Periode: " . date('d-m-Y', $dari) . " s.d. " . date('d-m-Y', $sampai));
+
 
 // Header tabel
 $headers = ['No', 'Nama', 'Hadir', 'Sakit', 'Ijin', 'Alpa', 'Dispensasi', "Persentase (dari {$total_unit} {$unit_label})"];
-$active->fromArray($headers, null, "A5");
+$active->fromArray($headers, null, "A6");
 
 // Format header
 $lastCol = chr(ord('A') + count($headers) - 1); // A..H
-$active->getStyle("A5:{$lastCol}5")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$active->getStyle("A5:{$lastCol}5")->getFont()->setBold(true);
+$active->getStyle("A6:{$lastCol}6")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$active->getStyle("A6:{$lastCol}6")->getFont()->setBold(true);
+$active->getStyle("A1:A4")->getFont()->setBold(true);
+$active->getStyle("A1:A4")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 // Data
-$row = 6; $no = 1;
+$row = 7; $no = 1;
 foreach ($data as $uid => $d) {
     $total = $total_unit;
 
@@ -209,10 +221,13 @@ foreach ($data as $uid => $d) {
 }
 
 // Style alignment
-$active->getStyle("A6:A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$active->getStyle("B6:B{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-$active->getStyle("C6:H{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
+$active->getStyle("A7:A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$active->getStyle("B7:B{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+$active->getStyle("C7:H{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+// Auto width kolom
+foreach (range('A', 'H') as $col) {
+    $active->getColumnDimension($col)->setAutoSize(true);
+}
 // TTD
 global $USER;
 $namaguru = $USER->lastname ?? 'Nama Guru';
@@ -220,19 +235,34 @@ $nipfieldid = $DB->get_field('user_info_field', 'id', ['shortname' => 'nip']);
 $nipguru = $nipfieldid ? ($DB->get_field('user_info_data', 'data', ['userid' => $USER->id, 'fieldid' => $nipfieldid]) ?? 'NIP Tidak Ditemukan') : 'NIP Tidak Ditemukan';
 
 $row += 2;
-$active->setCellValue("H{$row}", 'Kandangan, ' . date('d F Y'));
+$active->setCellValue("H{$row}", $tempat . ', ' . date('d F Y'));
 $row++;
+
 $active->setCellValue("B{$row}", 'Mengetahui');
 $active->setCellValue("H{$row}", 'Guru Mata Pelajaran');
+
 $row += 4;
-$active->setCellValue("B{$row}", 'Jainuddin, S.Ag., M.Pd.I');
+
+// Kepsek
+$active->setCellValue("B{$row}", $nama_kepsek);
 $active->setCellValue("H{$row}", $namaguru);
 $row++;
-$active->setCellValue("B{$row}", 'NIP 19771005 200904 1 002');
+
+$active->setCellValue("B{$row}", 'NIP ' . $nip_kepsek);
 $active->setCellValue("H{$row}", 'NIP ' . $nipguru);
 
 // ===== Output =====
-$filename = 'rekap_kehadiran_' . $unit_label . '_' . date('Ymd') . '.' . $format;
+// Bersihkan nama kelas (hapus spasi & karakter aneh)
+$kelasfile = preg_replace('/[^a-zA-Z0-9]/', '_', $kelasnama);
+
+// Rapikan underscore ganda
+$kelasfile = preg_replace('/_+/', '_', $kelasfile);
+
+// Hapus underscore di awal/akhir
+$kelasfile = trim($kelasfile, '_');
+
+// Format nama file
+$filename = 'rekap_kehadiran_kelas_' . $kelasfile . '_' . date('Ymd') . '.' . $format;
 
 if ($format === 'ods') {
     header('Content-Type: application/vnd.oasis.opendocument.spreadsheet');

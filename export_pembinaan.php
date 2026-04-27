@@ -1,8 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once(__DIR__ . '/../../config.php');
 require_login();
 
@@ -15,6 +11,13 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 $context = context_system::instance();
 require_capability('local/jurnalmengajar:view', $context);
 global $DB, $USER;
+$config = get_config('local_jurnalmengajar');
+
+$nama_sekolah = $config->nama_sekolah ?? 'Nama Sekolah';
+$tahun_ajaran = $config->tahun_ajaran ?? '';
+$tempat       = $config->tempat_ttd ?? 'Tempat';
+$nama_kepsek  = $config->nama_kepsek ?? 'Nama Kepala Sekolah';
+$nip_kepsek   = $config->nip_kepsek ?? 'NIP';
 
 function format_tanggal_indonesia($timestamp) {
     $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -30,17 +33,22 @@ $bulanmap = [
     '07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'
 ];
 $namabulan = $bulanmap[$bulan] ?? $bulan;
-$filename = $bulan && $tahun ? "pembinaan_{$namabulan}_{$tahun}.xlsx" : "pembinaan_semua.xlsx";
+$bulanfile = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $namabulan));
+$filename = $bulan && $tahun 
+    ? "pembinaan_{$bulanfile}_{$tahun}.xlsx" 
+    : "pembinaan_semua.xlsx";
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
+
 // Judul
 $sheet->mergeCells('A1:G1')->setCellValue('A1', 'LAPORAN PEMBINAAN SISWA');
-$sheet->mergeCells('A2:G2')->setCellValue('A2', 'SMAN 2 KANDANGAN');
-$sheet->mergeCells('A3:G3')->setCellValue('A3', 'TAHUN AJARAN 2025/2026');
+$sheet->mergeCells('A2:G2')->setCellValue('A2', strtoupper($nama_sekolah));
+$sheet->mergeCells('A3:G3')->setCellValue('A3', 'Tahun Ajaran '.$tahun_ajaran);
 $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(14);
+$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+$sheet->getStyle('A2:A3')->getFont()->setBold(true)->setSize(12);
 
 $sheet->setCellValue('B5', 'Bulan:');
 $sheet->setCellValue('C5', $namabulan . ' ' . $tahun);
@@ -49,7 +57,9 @@ $sheet->setCellValue('C5', $namabulan . ' ' . $tahun);
 $header = ['No','Hari Tanggal','Nama Murid','Kelas','Permasalahan','Upaya yang Dilakukan','Guru BK'];
 $sheet->fromArray($header, NULL, 'A7');
 $sheet->getStyle('A7:G7')->getFont()->setBold(true);
-$sheet->getStyle('A7:G7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle('A7:G7')->getAlignment()
+    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+    ->setVertical(Alignment::VERTICAL_CENTER);
 $sheet->getStyle('A7:G7')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 $sheet->getStyle('A7:G7')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0FFFF');
 
@@ -78,6 +88,10 @@ foreach ($records as $r) {
     $row++;
 }
 
+for ($i = 8; $i < $row; $i++) {
+    $sheet->getRowDimension($i)->setRowHeight(-1);
+}
+
 // === Ambil NIP dari profile field user ===
 $nipguru = $DB->get_field('user_info_data', 'data', [
     'userid' => $USER->id,
@@ -87,23 +101,50 @@ $nipguru = $DB->get_field('user_info_data', 'data', [
 // === Tanda tangan ===
 $row += 2;
 $sheet->setCellValue("B{$row}", 'Mengetahui');
-$sheet->setCellValue("F{$row}", 'Hulu Sungai Selatan, '.format_tanggal_indonesia(time()));
+$sheet->setCellValue("F{$row}", $tempat.', '.format_tanggal_indonesia(time()));
 $row++;
-$sheet->setCellValue("B{$row}", 'Kepala SMAN 2 Kandangan');
+
+$sheet->setCellValue("B{$row}", 'Kepala Sekolah');
 $sheet->setCellValue("F{$row}", 'Guru BK');
 $row += 4;
-$sheet->setCellValue("B{$row}", 'Jainuddin, S.Ag., M.Pd.I');
+
+$sheet->setCellValue("B{$row}", $nama_kepsek);
 $sheet->setCellValue("F{$row}", $DB->get_field('user','lastname',['id'=>$USER->id]));
 $row++;
-$sheet->setCellValue("B{$row}", 'NIP 19771005 200904 1 002');
+
+$sheet->setCellValue("B{$row}", 'NIP '.$nip_kepsek);
 $sheet->setCellValue("F{$row}", 'NIP '.$nipguru);
 
 
 // Auto width
-foreach(range('A','G') as $col){$sheet->getColumnDimension($col)->setAutoSize(true);}
+foreach (['A','D','G'] as $col) {
+    $sheet->getColumnDimension($col)->setAutoSize(true);
+}
 
+// Lebar kolom manual
+$sheet->getColumnDimension('B')->setWidth(20); // tanggal
+$sheet->getColumnDimension('C')->setWidth(25); // nama siswa
+$sheet->getColumnDimension('E')->setWidth(30); // permasalahan
+$sheet->getColumnDimension('F')->setWidth(30); // tindakan
+
+$sheet->getStyle("E8:E{$row}")
+    ->getAlignment()->setWrapText(true);
+
+$sheet->getStyle("F8:F{$row}")
+    ->getAlignment()->setWrapText(true);
+
+$sheet->getStyle("E8:F{$row}")
+    ->getAlignment()
+    ->setVertical(Alignment::VERTICAL_TOP);    
+
+// TAMBAHKAN DI SINI
+$sheet->getStyle("A8:G{$row}")
+    ->getAlignment()
+    ->setVertical(Alignment::VERTICAL_TOP);
+    
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
+
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 exit;

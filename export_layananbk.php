@@ -34,6 +34,14 @@ $starttime = strtotime("first day of $tahun-$bulan");
 $endtime   = strtotime("+1 month", $starttime);
 
 global $DB, $USER;
+$config = get_config('local_jurnalmengajar');
+
+$nama_sekolah = $config->nama_sekolah ?? 'Nama Sekolah';
+$tahun_ajaran = $config->tahun_ajaran ?? '';
+$tempat       = $config->tempat_ttd ?? 'Tempat';
+$nama_kepsek  = $config->nama_kepsek ?? 'Nama Kepala Sekolah';
+$nip_kepsek   = $config->nip_kepsek ?? 'NIP';
+
 $records = $DB->get_records_sql(
     "SELECT * FROM {local_jurnallayananbk} 
      WHERE timecreated >= :start AND timecreated < :end 
@@ -52,21 +60,26 @@ $sheet = $spreadsheet->getActiveSheet();
 
 // Judul
 $sheet->mergeCells('A1:G1')->setCellValue('A1','LAPORAN LAYANAN BK');
-$sheet->mergeCells('A2:G2')->setCellValue('A2','SMAN 2 KANDANGAN');
-$sheet->mergeCells('A3:G3')->setCellValue('A3',"Periode: {$namabulan}-{$tahun}");
-$sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(14);
-$sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->mergeCells('A2:G2')->setCellValue('A2', mb_strtoupper($nama_sekolah,'UTF-8'));
+$sheet->mergeCells('A3:G3')->setCellValue('A3','Tahun Ajaran '.$tahun_ajaran);
+$sheet->mergeCells('A4:G4')->setCellValue('A4',"Periode: {$namabulan} {$tahun}");
+
+$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+$sheet->getStyle('A2:A3')->getFont()->setBold(true)->setSize(12);
+$sheet->getStyle('A1:A4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 // Header kolom
 $header = ['No','Waktu','Kelas','Jenis Layanan','Topik','Peserta','Tindak Lanjut / Catatan'];
-$sheet->fromArray($header,null,'A5');
-$sheet->getStyle('A5:G5')->getFont()->setBold(true);
-$sheet->getStyle('A5:G5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$sheet->getStyle('A5:G5')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-$sheet->getStyle('A5:G5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0FFFF');
+$sheet->fromArray($header,null,'A6');
+$sheet->getStyle('A6:G6')->getFont()->setBold(true);
+$sheet->getStyle('A6:G6')->getAlignment()
+    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+    ->setVertical(Alignment::VERTICAL_CENTER);
+$sheet->getStyle('A6:G6')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+$sheet->getStyle('A6:G6')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0FFFF');
 
 // Isi data
-$row = 6; $no = 1;
+$row = 7; $no = 1;
 foreach ($records as $r) {
     $kelas = $DB->get_field('cohort','name',['id'=>$r->kelas]) ?? '-';
     $peserta = json_decode($r->peserta,true);
@@ -87,27 +100,47 @@ foreach ($records as $r) {
     $row++;
 }
 
+for ($i = 7; $i < $row; $i++) {
+    $sheet->getRowDimension($i)->setRowHeight(-1);
+}
+
 // tanda tangan
 $row += 2;
 $sheet->setCellValue("B{$row}",'Mengetahui');
-$sheet->setCellValue("F{$row}",'Hulu Sungai Selatan, '.format_tanggal_indonesia(time()));
+$sheet->setCellValue("F{$row}",$tempat.', '.format_tanggal_indonesia(time()));
 $row++;
-$sheet->setCellValue("B{$row}",'Kepala SMAN 2 Kandangan');
+
+$sheet->setCellValue("B{$row}",'Kepala Sekolah');
 $sheet->setCellValue("F{$row}",'Guru BK');
-$row+=4;
-$sheet->setCellValue("B{$row}",'Jainuddin, S.Ag., M.Pd.I');
+$row += 4;
+
+$sheet->setCellValue("B{$row}",$nama_kepsek);
 $sheet->setCellValue("F{$row}",$DB->get_field('user','lastname',['id'=>$USER->id]));
 $row++;
-$sheet->setCellValue("B{$row}",'NIP 19771005 200904 1 002');
+
+$sheet->setCellValue("B{$row}",'NIP '.$nip_kepsek);
 $sheet->setCellValue("F{$row}",'NIP '.$nipguru);
 
 // Auto width
-foreach(range('A','G') as $col) {
+foreach (['A','C'] as $col) {
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
 
+// manual
+$sheet->getColumnDimension('B')->setWidth(18);
+$sheet->getColumnDimension('D')->setWidth(22);
+$sheet->getColumnDimension('E')->setWidth(25);
+$sheet->getColumnDimension('F')->setWidth(30);
+$sheet->getColumnDimension('G')->setWidth(35);
+    
+$sheet->getStyle("E7:G{$row}")
+    ->getAlignment()
+    ->setWrapText(true)
+    ->setVertical(Alignment::VERTICAL_TOP);
+    
 // Output
-$filename = "layananbk_{$namabulan}_{$tahun}.xlsx";
+$bulanfile = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $namabulan));
+$filename = "layananbk_{$bulanfile}_{$tahun}.xlsx";
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 $writer = new Xlsx($spreadsheet);
