@@ -91,14 +91,13 @@ echo html_writer::start_tag('form', [
 ]);
 
 echo "Filter Guru Wali: ";
-echo html_writer::select($listguru, 'guru', $filterguru);
-
-echo html_writer::empty_tag('input', [
-    'type' => 'submit',
-    'value' => 'Tampilkan',
-    'class' => 'btn btn-secondary',
-    'style' => 'margin-left:5px'
-]);
+echo html_writer::select(
+    $listguru,
+    'guru',
+    $filterguru,
+    null,
+    ['onchange' => 'this.form.submit()']
+);
 
 echo html_writer::end_tag('form');
 

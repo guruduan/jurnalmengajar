@@ -19,6 +19,7 @@ $siswafilter = optional_param('siswaid', 0, PARAM_INT);
 $dari = optional_param('dari', '', PARAM_RAW);
 $sampai = optional_param('sampai', '', PARAM_RAW);
 $page = optional_param('page', 0, PARAM_INT);
+$keperluanfilter = optional_param('keperluan', '', PARAM_TEXT);
 
 $perpage = 20;
 $offset  = $page * $perpage;
@@ -57,6 +58,10 @@ if ($siswafilter) {
     $countsql .= " AND si.userid = :siswa";
     $params['siswa'] = $siswafilter;
 }
+if ($keperluanfilter) {
+    $countsql .= " AND si.keperluan = :keperluan";
+    $params['keperluan'] = $keperluanfilter;
+}
 
 $total = $DB->count_records_sql($countsql, $params);
 
@@ -78,6 +83,10 @@ if ($kelasfilter) {
 
 if ($siswafilter) {
     $sql .= " AND si.userid = :siswa";
+}
+
+if ($keperluanfilter) {
+    $sql .= " AND si.keperluan = :keperluan";
 }
 
 $sql .= " ORDER BY si.timecreated DESC
@@ -107,6 +116,16 @@ if ($kelasfilter) {
 }
 
 echo html_writer::start_div();
+echo html_writer::label('Keperluan', 'keperluan') . ' ';
+echo html_writer::select([
+    '' => 'Semua',
+    'izin masuk' => 'Izin Masuk',
+    'izin keluar' => 'Izin Keluar',
+    'izin pulang' => 'Izin Pulang'
+], 'keperluan', $keperluanfilter);
+echo html_writer::end_div();
+
+echo html_writer::start_div();
 echo html_writer::label('Dari', 'dari') . ' ';
 echo html_writer::empty_tag('input', ['type' => 'date', 'name' => 'dari', 'value' => $dari]);
 echo ' ';
@@ -122,9 +141,18 @@ echo html_writer::end_tag('form');
 // TABEL
 // =====================
 if ($results) {
-    $table = new html_table();
-    $table->head = ['No', 'Tanggal', 'Nama Murid', 'Kelas', 'Guru Pengajar', 'Alasan', 'Keperluan', 'Pengawas'];
-    $table->data = [];
+
+    echo "<table class='generaltable'>";
+    echo "<tr>
+    <th>No</th>
+    <th>Tanggal</th>
+    <th>Nama Murid</th>
+    <th>Kelas</th>
+    <th>Guru Pengajar</th>
+    <th>Alasan</th>
+    <th>Keperluan</th>
+    <th>Pengawas</th>
+    </tr>";
 
     $no = $offset + 1;
 
@@ -132,23 +160,44 @@ if ($results) {
         $tanggal = tanggal_indo($row->timecreated);
         $kelas   = get_nama_kelas($row->kelasid);
 
-        $table->data[] = [
-            $no++,
-            $tanggal,
-            format_nama_siswa($row->siswa),
-            $kelas,
-            $row->gurupengajar,
-            $row->alasan,
-            $row->keperluan,
-            $row->penginput
-        ];
+        // WARNA
+        switch (strtolower($row->keperluan)) {
+            case 'izin masuk':
+                $warna = '#b7d3b6';
+                $label = 'Izin Masuk';
+                break;
+            case 'izin keluar':
+                $warna = '#f3d6a4';
+                $label = 'Izin Keluar';
+                break;
+            case 'izin pulang':
+                $warna = '#e6b0bd';
+                $label = 'Izin Pulang';
+                break;
+            default:
+                $warna = '#f5f5f5';
+                $label = $row->keperluan;
+        }
+
+        echo "<tr style='background:$warna'>";
+        echo "<td>$no</td>";
+        echo "<td>$tanggal</td>";
+        echo "<td>" . format_nama_siswa($row->siswa) . "</td>";
+        echo "<td>$kelas</td>";
+        echo "<td>{$row->gurupengajar}</td>";
+        echo "<td>{$row->alasan}</td>";
+        echo "<td><b>$label</b></td>";
+        echo "<td>{$row->penginput}</td>";
+        echo "</tr>";
+
+        $no++;
     }
 
-    echo html_writer::table($table);
+    echo "</table>";
+
 } else {
     echo $OUTPUT->notification('Tidak ada data surat izin pada filter ini.', 'notifymessage');
 }
-
 // =====================
 // PAGING
 // =====================
@@ -156,7 +205,8 @@ $baseurl = new moodle_url('/local/jurnalmengajar/rekap_surat_izin.php', [
     'kelas' => $kelasfilter,
     'siswaid' => $siswafilter,
     'dari' => $dari,
-    'sampai' => $sampai
+    'sampai' => $sampai,
+    'keperluan' => $keperluanfilter
 ]);
 
 echo $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);

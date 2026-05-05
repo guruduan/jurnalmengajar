@@ -144,18 +144,16 @@ echo $OUTPUT->header();
 echo html_writer::start_tag('form', ['method'=>'get']);
 
 echo html_writer::label('Guru Wali', 'userid');
-echo html_writer::select($listguru, 'userid', $userid);
+echo html_writer::select($listguru, 'userid', $userid, null, [
+    'onchange' => 'this.form.submit()'
+]);
 echo "<br><br>";
 
 echo html_writer::label('Kelas', 'kelas');
-echo html_writer::select($listkelas, 'kelas', $kelas);
-
-echo html_writer::empty_tag('input', [
-    'type'=>'submit',
-    'value'=>'Tampilkan Murid',
-    'class'=>'btn btn-secondary',
-    'style'=>'margin-left:10px'
+echo html_writer::select($listkelas, 'kelas', $kelas, null, [
+    'onchange' => 'this.form.submit()'
 ]);
+
 
 echo html_writer::end_tag('form');
 
